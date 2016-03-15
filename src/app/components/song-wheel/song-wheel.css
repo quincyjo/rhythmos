@@ -1,0 +1,20 @@
+.wheel {
+  float: right;
+  width: 50%;
+}
+
+.wheel ul.songs li.song {
+  list-style: none;
+  background: #eee;
+  font-size:2em;
+  cursor:pointer;
+}
+
+.wheel ul.songs li.song.selected {
+  background:#fafafa;
+}
+
+.song-detail{
+  float:left;
+  width:50%;
+}

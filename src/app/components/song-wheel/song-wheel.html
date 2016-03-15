@@ -1,0 +1,14 @@
+<h2>{{title}}</h2>
+<div class="song-detail">
+  <song-detail [song]="selectedSong"></song-detail>
+</div>
+<div class="wheel">
+  <ul class="songs">
+    <li *ngFor="#song of songs"
+      class="song"
+      [class.selected]="song === selectedSong"
+      (click)="onSelect(song)">
+      <span class="badge">{{song.id}}</span> {{song.title}}
+    </li>
+  </ul>
+</div>
