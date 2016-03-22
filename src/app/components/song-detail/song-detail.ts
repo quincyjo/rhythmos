@@ -1,5 +1,5 @@
 import {Component} from 'angular2/core';
-import {Song} from '../../services/song-provider/song';
+import {Song} from '../../shared/interfaces/song';
 
 @Component({
   selector: 'song-detail',

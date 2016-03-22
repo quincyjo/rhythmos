@@ -1,6 +1,6 @@
 import {Component} from 'angular2/core';
 import {OnInit} from 'angular2/core';
-import {Song} from '../../services/song-provider/song';
+import {Song} from '../../shared/interfaces/song';
 import {SongDetail} from '../song-detail/song-detail';
 import {SongProvider} from '../../services/song-provider/song-provider';
 
