@@ -1,5 +1,5 @@
 import {Injectable} from 'angular2/core';
-import {Song} from './song';
+import {Song} from '../../shared/interfaces/song';
 import {SONGS} from './mock-songs';
 
 
