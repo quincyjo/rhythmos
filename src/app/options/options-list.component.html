@@ -1,0 +1,10 @@
+<h2>Options List</h2>
+
+<ul>
+  <li *ngFor="#options of options">
+    <a
+      [routerLink]="['OptionsDetail', { id: options.id }]">
+      {{options.label}}
+    </a>
+  </li>
+</ul>
