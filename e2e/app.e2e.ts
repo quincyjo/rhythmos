@@ -1,5 +1,3 @@
-/// <reference path="../typings/main.d.ts" />
-
 import { RhythmosPage } from './app.po';
 
 describe('rhythmos App', function() {
@@ -10,7 +8,7 @@ describe('rhythmos App', function() {
   })
 
   it('should display message saying app works', () => {
-    page.navigateTo()
+    page.navigateTo();
     expect(page.getParagraphText()).toEqual('rhythmos Works!');
   });
 });
