@@ -9,10 +9,6 @@ import {CanDeactivate, ComponentInstruction, ROUTER_DIRECTIVES} from 'angular2/r
   styleUrls: ['app/options/options-list.component.css'],
   directives: [ROUTER_DIRECTIVES],
 })
-@RouteConfig([
-  {path:'/...', name: 'OptionsList', component: OptionsListComponent, useAsDefault: true},
-  {path:'/:id/...', name: 'OptionsDetail', component: OptionsListComponent}
-])
 export class OptionsListComponent implements OnInit {
   options: Option[];
   option: Option;
