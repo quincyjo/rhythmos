@@ -1,9 +1,16 @@
-<h1>Rhythmos</h1>
-<ul>
-  <li>
-    <a [routerLink]="['SongWheel']">Play</a>
-  </li>
-  <li>
-    <a [routerLink]="['Options']">Options</a>
-  </li>
-</ul>
+<div class="main-menu">
+  <div class="main-menu-content">
+    <h1>Rhythmos</h1>
+    <ul>
+      <li *ngFor="#item of menu">
+        <a [routerLink]="[item.link]">{{item.label}}</a>
+      </li>
+      <li>
+        <a class="selected" [routerLink]="['SongWheel']">Play</a>
+      </li>
+      <li>
+        <a [routerLink]="['Options']">Options</a>
+      </li>
+    </ul>
+  </div>
+</div>
