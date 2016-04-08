@@ -11,6 +11,7 @@ import {OptionsProvider} from '../services/options-provider/options-provider';
   directives: [RouterOutlet]
 })
 @RouteConfig([
+  {path:'/:id', name: 'OptionsList', component: OptionsListComponent},
   {path:'/', name: 'OptionsList', component: OptionsListComponent, useAsDefault: true},
   {path:'/:id/...', name: 'OptionsDetail', component: OptionsRoot}
 ])
