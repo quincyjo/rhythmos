@@ -2,7 +2,7 @@ import {Option} from '../../shared/interfaces/option';
 
 export var OPTIONS: Option[] = [
   {
-    id: 0,
+    id: 1,
     label: "Graphic Options",
     value: null,
     dirty: null,
@@ -10,7 +10,7 @@ export var OPTIONS: Option[] = [
     tags: null,
     children: [
       {
-        id: 1,
+        id: 2,
         label: "Graphic Option 1",
         value: 0,
         dirty: false,
@@ -19,7 +19,7 @@ export var OPTIONS: Option[] = [
         children: []
       },
       {
-        id: 2,
+        id: 3,
         label: "Graphic Option 2",
         value: 0,
         dirty: false,

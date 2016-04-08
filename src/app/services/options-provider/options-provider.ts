@@ -13,7 +13,7 @@ export class OptionsProvider {
 
   get(id: number, target = OPTIONS) {
     var opt: Promise<Option>;
-    for (var option of OPTIONS) {
+    for (var option of target) {
       if (option.id === id){
         return Promise.resolve(option);
       }
