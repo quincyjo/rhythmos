@@ -3,7 +3,7 @@ import {Song} from '../shared/interfaces/song';
 import {SONGS} from '../services/song-provider/mock-songs';
 
 @Injectable()
-export class SongModel {
+export class SongsModel {
   private _songs: Array<Song>;
 
   constructor() {
