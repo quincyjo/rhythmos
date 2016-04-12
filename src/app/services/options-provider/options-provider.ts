@@ -1,19 +1,19 @@
 import {Injectable} from 'angular2/core';
 import {Option} from '../../shared/interfaces/option';
-import {OPTIONS} from './mock-options';
+import {OptionsModel} from '../../models/options-model';
 
 @Injectable()
 export class OptionsProvider {
 
-  constructor() {}
+  constructor(private _model: OptionsModel) {}
 
   getOptions() {
-    return Promise.resolve(OPTIONS);
+    return Promise.resolve(this._model.getOptions());
   }
 
-  get(id: number, target = OPTIONS) {
-    var opt: Promise<Option>;
-    for (var option of target) {
+  get(id: number, target = this._model.getOptions()) {
+    let opt: Promise<Option>;
+    for (let option of target) {
       if (option.id === id){
         return Promise.resolve(option);
       }
