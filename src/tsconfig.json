@@ -15,9 +15,39 @@
     "sourceRoot": "/",
     "target": "es5"
   },
-
-  "files": [
+  "filesGlob": [
+    "./app/**/*.ts",
     "app.ts",
     "typings.d.ts"
-  ]
+  ],
+  "files": [
+    "./app/components/main-menu/main-menu.spec.ts",
+    "./app/components/main-menu/main-menu.ts",
+    "./app/components/song-detail/song-detail.spec.ts",
+    "./app/components/song-detail/song-detail.ts",
+    "./app/components/song-wheel/song-wheel.spec.ts",
+    "./app/components/song-wheel/song-wheel.ts",
+    "./app/models/song-model.ts",
+    "./app/options/options-detail.component.spec.ts",
+    "./app/options/options-detail.component.ts",
+    "./app/options/options-list.component.spec.ts",
+    "./app/options/options-list.component.ts",
+    "./app/options/options-root.component.ts",
+    "./app/rhythmos.spec.ts",
+    "./app/rhythmos.ts",
+    "./app/services/options-provider/mock-options.ts",
+    "./app/services/options-provider/options-provider.spec.ts",
+    "./app/services/options-provider/options-provider.ts",
+    "./app/services/song-provider/mock-songs.ts",
+    "./app/services/song-provider/song-provider.spec.ts",
+    "./app/services/song-provider/song-provider.ts",
+    "./app/shared/interfaces/option.ts",
+    "./app/shared/interfaces/song.ts",
+    "./app/song-wheel/song-wheel-root.component.ts",
+    "app.ts",
+    "typings.d.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
 }
