@@ -2,8 +2,16 @@
   <div class="main-menu-content">
     <h1>Rhythmos</h1>
     <ul>
-      <li>
-        <a class="selected" [routerLink]="['SongWheel']">Play</a>
+      <li #item *ngFor="#elem of menu"
+        (mouseenter)="item.hover = true;"
+        (mouseleave)="item.hover = false;">
+        <!-- TODO: Dynamically configure the Angular Router service to make
+        //      the routerLinke work with elem link attribute. -->
+        <a class="selected"
+          [ngClass]="{'selected': item.hover}"
+          [routerLink]="['SongWheel']">
+          {{elem.label}}
+        </a>
       </li>
       <li>
         <a [routerLink]="['Options']">Options</a>
