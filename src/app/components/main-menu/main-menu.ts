@@ -11,7 +11,7 @@ import {ROUTER_DIRECTIVES} from 'angular2/router';
   pipes: []
 })
 export class MainMenu {
-  menu = [
+  public menu = [
     {
       label: "Play",
       link: "SongWHeel"
