@@ -1,4 +1,5 @@
-import {Component} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
+import {Router} from 'angular2/router';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 
@@ -8,20 +9,79 @@ import {ROUTER_DIRECTIVES} from 'angular2/router';
   styleUrls: ['app/components/main-menu/main-menu.css'],
   providers: [],
   directives: [ROUTER_DIRECTIVES],
-  pipes: []
+  pipes: [],
+  host: {
+    '(document:keyup)': '_keyup($event)'
+  }
 })
 export class MainMenu {
+  private _activeIndex: number;
   public menu = [
     {
-      label: "Play",
-      link: "SongWHeel"
+      name: "Play",
+      path: ['SongWheel'],
+      active: false
     },
     {
-      label: "Options",
-      link: "Options"
+      name: "Options",
+      path: ['Options'],
+      active: false
+    },
+    {
+      name: "Github Page",
+      path: null,
+      href: "http://www.github.com/verbetam/rhythmos",
+      active: false
     }
   ];
 
-  constructor() {}
+  constructor(private _router: Router) {}
 
+  ngOnInit() {
+    this.menu[0].active = true;
+    this._activeIndex = 0;
+  }
+
+  public select(route: any){
+    for(let i = 0; i < this.menu.length; i++){
+      this.menu[i].active = false;
+      if(this.menu[i] === route){
+        this._activeIndex = i;
+      }
+    }
+    route.active = true;
+  }
+
+  private _keyup(event: any){
+    switch(event.keyCode){
+      case 13: // Enter
+        this._keyEnter();
+        break;
+      case 40: // Down Arrow
+        this._keyDownArrow();
+        break;
+      case 38: // Up Arrow
+        this._keyUpArrow();
+        break;
+    }
+  }
+
+  private _keyEnter(){
+    let target = this.menu[this._activeIndex];
+    if(target.path){
+      this._router.navigate(target.path);
+    }
+  }
+
+  private _keyDownArrow(){
+    this.menu[this._activeIndex].active = false;
+    this._activeIndex = (++this._activeIndex % this.menu.length);
+    this.menu[this._activeIndex].active = true;
+  }
+
+  private _keyUpArrow(){
+    this.menu[this._activeIndex].active = false;
+    this._activeIndex = (--this._activeIndex % this.menu.length);
+    this.menu[this._activeIndex].active = true;
+  }
 }
