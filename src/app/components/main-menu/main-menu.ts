@@ -42,14 +42,12 @@ export class MainMenu {
     this._activeIndex = 0;
   }
 
-  public select(route: any){
-    for(let i = 0; i < this.menu.length; i++){
-      this.menu[i].active = false;
-      if(this.menu[i] === route){
-        this._activeIndex = i;
-      }
-    }
-    route.active = true;
+  public select(index: number){
+    this._activeIndex = index;
+  }
+
+  public isSelected(index: number){
+    return this._activeIndex === index;
   }
 
   private _keyup(event: any){
@@ -74,14 +72,10 @@ export class MainMenu {
   }
 
   private _keyDownArrow(){
-    this.menu[this._activeIndex].active = false;
     this._activeIndex = (++this._activeIndex % this.menu.length);
-    this.menu[this._activeIndex].active = true;
   }
 
   private _keyUpArrow(){
-    this.menu[this._activeIndex].active = false;
-    this._activeIndex = (--this._activeIndex % this.menu.length);
-    this.menu[this._activeIndex].active = true;
+    this._activeIndex = --this._activeIndex < 0 ? this.menu.length + this._activeIndex : this._activeIndex;
   }
 }
