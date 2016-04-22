@@ -2,16 +2,16 @@
   <div class="main-menu-content">
     <h1>Rhythmos</h1>
     <ul>
-      <li #item *ngFor="#route of menu"
-        (mouseenter)="select(route)">
+      <li #item *ngFor="#route of menu; #i = index"
+        (mouseenter)="select(i)">
         <a *ngIf="route.path"
-          [ngClass]="{'selected': route.active}"
+          [ngClass]="{'selected': isSelected(i)}"
           [routerLink]="route.path">
           {{route.name}}
         </a>
         <a *ngIf="route.href"
           target="_blank"
-          [ngClass]="{'selected': route.active}"
+          [ngClass]="{'selected': isSelected(i)}"
           [href]="route.href">
           {{route.name}}
         </a>
