@@ -1,91 +1,171 @@
 import {Injectable} from 'angular2/core';
 import {Song} from '../../shared/interfaces/song';
-import {SONGS} from './mock-songs';
+import {SONGS} from '../song-provider/mock-songs';
 
 @Injectable()
 export class DatabaseService {
   public name: string = 'Test';
-  db: IDBDatabase;
+  private dbVer: number = 18;
   constructor() {
-    let request = window.indexedDB.open("TestDB", 14);
+    let request = window.indexedDB.open("TestDB", this.dbVer);
     request.onupgradeneeded = (event) => {
-        this.db = (<IDBRequest>event.target).result;
-        if (this.db.objectStoreNames.contains("songs")) {
-          this.db.deleteObjectStore("songs");
+      let db = (<IDBRequest>event.target).result;
+      if (db.objectStoreNames.contains("songs")) {
+        db.deleteObjectStore("songs");
+      }
+      let objectStore: IDBObjectStore = db.createObjectStore("songs", {keyPath: "id"});
+      objectStore.createIndex('title', 'title', {unique: false});
+      objectStore.createIndex('artist', 'artist', {unique: false});
+      objectStore.transaction.oncomplete = (event) => {
+        let songObjectStore = db.transaction("songs", "readwrite").objectStore("songs");
+        for (let i = 0; i < SONGS.length - 1; i++){
+          songObjectStore.add(SONGS[i]);
         }
-        let objectStore = this.db.createObjectStore("songs", {keyPath: "title"});
-        objectStore.transaction.oncomplete = (event) => {
-          let songObjectStore = this.db.transaction("songs", "readwrite").objectStore("songs");
-          for (let i = 0; i < SONGS.length - 1; i++){
-            songObjectStore.add(SONGS[i]);
+      }
+    };
+  }
+
+  get(obStore, index, key) {
+    return new Promise((resolve, reject) => {
+      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction([obStore]).objectStore(obStore);
+        let request;
+        if (index == objectStore.keyPath) {
+          request = objectStore.get(key);
+        } else {
+          request = objectStore.index(index).get(key);
+        }
+        request.onerror = (event) => {
+          reject("error in read")
+        };
+        request.onsuccess = (event) => {
+          let result = (<IDBRequest>event.target).result;
+          if (result) {
+            resolve(result);
           }
-        }
-    };
-    request.onsuccess = (event) => {
-      this.db = (<IDBRequest>event.target).result;
-      this.db.onerror = (event) => {
-        alert("Database Error");
+          else {
+            reject("Failed to retrieve data.")
+          }
+        };
+        request.onerror = () => {reject("Failed to retrieve data.")};
       };
-    };
-    request.onerror = (event) => {
-      this.db = null;
-    };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+    });
   }
-
-  getData(obStore, keyName, key) {
+  getAll(obStore, index?, key1?, key2 = key1) {
     return new Promise((resolve, reject) => {
-      let request = this.db.transaction([obStore]).objectStore(obStore).get(key);
-      request.onerror = (event) => {
-        reject("error in read")
-      };
-      request.onsuccess = (event) => {
-        let result = (<IDBRequest>event.target).result;
-        if (result) {
-          resolve(result);
+      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db: IDBDatabase = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction([obStore]).objectStore(obStore);
+        if (!index) {
+          index = objectStore.keyPath;
         }
-        else {
-          reject("Failed to retrieve data.")
+        let keyRange;
+        if (key1) {
+          keyRange = IDBKeyRange.bound(key1, key2);
         }
+        let request;
+        if (index == objectStore.keyPath) {
+          request = objectStore.openCursor(keyRange);
+          request.onerror = () => {reject("Failed to retrieve data (keypath).")};
+        } else {
+          request = objectStore.index(index).openCursor(keyRange);
+          request.onerror = () => {reject("Failed to retrieve data. (index)")};
+        }
+        let result: Song[] = [];
+        request.onsuccess = (event) => {
+          let cursor = request.result;
+          if (cursor) {
+            result.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(result);
+          }
+        };
       };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
     });
   }
 
-  putData(obStore, data) {
+  put(obStore, data) {
     return new Promise((resolve, reject) => {
-      let objectStore = this.db.transaction(obStore, "readwrite").objectStore(obStore);
-      objectStore.add(data);
+      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
+        objectStore.add(data);
+      };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+    });
+  }
+  putAll(obStore, data) {
+  return new Promise((resolve, reject) => {
+    let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
+        for (let i = 0; i < data.length; i++){
+          objectStore.add(data[i]);
+        }
+      };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
     });
   }
 
-  getAll(obStore) {
+  delete(obStore, index,  key) {
     return new Promise((resolve, reject) => {
-      let request = this.db.transaction([obStore]).objectStore(obStore).openCursor();
-      request.onsuccess = function(event) {
-        let result = (<IDBRequest>event.target).result;
-        if (result) { 
-          resolve(result);
+      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
+        let request;
+        if (index == objectStore.keyPath) {
+          request = objectStore.delete(key);
+        } else {
+          request = objectStore.index(index).delete(key);
         }
-        else {
-          reject("Failed to retrieve data.")
-        }
-      }
+        request.onerror = (event) => {
+          reject("Could not delete " + key + " from " )
+        };
+      };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
     });
   }
-
-  getSome(obStore, keyName, key1?, key2 = key1) {
+  deleteAll(obStore, index?, key1?, key2 = key1) {
     return new Promise((resolve, reject) => {
-      let index = this.db.transaction([obStore])
-        .objectStore(obStore).index(keyName);
-      let keyRange = IDBKeyRange.bound(key1, key2);
-      let request = index.openCursor(keyRange, null);
-      request.onsuccess = (event) => {
-        if ((<IDBRequest>event.target).result) {
-          resolve(event.target.result);
+      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
+      dbRequest.onsuccess = (event) => {
+        let db: IDBDatabase = (<IDBRequest>event.target).result;
+        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
+        if (!index) {
+          index = objectStore.keyPath;
         }
-        else {
-          reject("Failed to retrieve data.")
+        let keyRange;
+        if (key1) {
+          keyRange = IDBKeyRange.bound(key1, key2);
         }
-      }
+        let request;
+        if (index == objectStore.keyPath) {
+          request = objectStore.openCursor(keyRange);
+        } else {
+          request = objectStore.index(index).openCursor(keyRange);
+        }
+        let result: Song[] = [];
+        request.onsuccess = (event) => {
+          let cursor = request.result;
+          if (cursor) {
+            cursor.delete();
+            cursor.continue();
+          } else {
+            resolve();
+          }
+        };
+        request.onerror = () => {reject("Failed to delete data.")};
+      };
+      dbRequest.onerror = () => {reject("Failed to connect to database.")};
     });
   }
 }
