@@ -1,6 +1,6 @@
 import {describe, it, expect, inject, injectAsync, beforeEachProviders} from 'angular2/testing';
 import {DatabaseService} from './database-service';
-import {SONGS} from './mock-songs';
+import {SONGS} from '../song-provider/mock-songs';
 
 describe('Database Service', () => {
   beforeEachProviders(() => [DatabaseService]);
@@ -12,32 +12,85 @@ describe('Database Service', () => {
   it('should find', injectAsync([DatabaseService], (service) => {
     let store = "songs";
     let keyName = "title";
-    let testTitle = "Goin' Under";
-    return service.getData(store, keyName, testTitle)
-      .then(song => {
-        expect(song['title']).toEqual(testTitle + "ljklj;lj;");
-      });
+    let testTitle = SONGS[1]['title'];
+    let getData = service.get(store, keyName, testTitle);
+    let test = getData.then(song => {
+      expect(song['title']).toEqual(testTitle);
+    })
+    return test;
   }));
 
   it('should add and find', injectAsync([DatabaseService], (service) => {
     let store = "songs";
     let keyName = "title";
-    service.putData(store, SONGS[2]);
-    return service.getData(store, keyName, SONGS[2]['title'])
-      .then(song => {expect(song).toEqual(SONGS[2])});
+    let testTitle = SONGS[2]['title'];
+    service.put(store, SONGS[2]);
+    let getData = service.get(store, keyName, testTitle);
+    let test = getData.then(song => {
+      expect(song).toEqual(SONGS[2]);
+    });
+    return test;
   }));
 
   it('should find all', injectAsync([DatabaseService], (service) => {
     let store = "songs";
-    return service.getAll(store)
-      .then(songs => {expect(songs[0]).toEqual(SONGS[0])});
+    let getAll = service.getAll(store);
+    let test = getAll.then(songs => {
+      expect(songs.length).toEqual(3);
+      expect(songs[0]).toEqual(SONGS[0]);
+    });
+    return test;
   }));
 
   it('should find some', injectAsync([DatabaseService], (service) => {
     let store = "songs";
-    let keyName = "artist";
-    let testKey = "NegaRen";
-    return service.getSome(store, keyName, testKey, testKey)
-      .then(songs => {expect(songs[0]['artist']).toBe(5)});
+    let index = 'id';
+    let testKey1 = 0;
+    let testKey2 = 1;
+    let getSome = service.getAll(store, index);
+    let test = getSome.then(songs => {
+      expect(songs.length).toEqual(3);
+      expect(songs[0]).toEqual(SONGS[0]);
+      expect(songs[1]).toEqual(SONGS[1]);
+    });
+    return test;
+  }));
+
+  it('should delete', injectAsync([DatabaseService], (service) => {
+    let store = "songs";
+    let index = 'id';
+    let testKey = 2;
+    service.delete(store, index, testKey);
+    let getSome = service.getAll(store);
+    let test = getSome.then(songs => {
+      expect(songs.length).toEqual(2);
+      expect(songs[0]).toEqual(SONGS[0]);
+      expect(songs[1]).toEqual(SONGS[1]);
+    });
+    return test;
+  }));
+
+  it('should delete all', injectAsync([DatabaseService], (service) => {
+    let store = "songs";
+    let index = 'id';
+    let testKey = 2;
+    service.deleteAll(store);
+    let getSome = service.getAll(store);
+    let test = getSome.then(songs => {
+      expect(songs.length).toEqual(0);
+    });
+    return test;
+  }));
+
+  it('should add all', injectAsync([DatabaseService], (service) => {
+    let store = "songs";
+    service.putAll(store, SONGS);
+    let getAll = service.getAll(store);
+    let test = getAll.then(songs => {
+      expect(songs.length).toEqual(3);
+      expect(songs[0]).toEqual(SONGS[0]);
+      expect(songs[1]).toEqual(SONGS[1]);
+    });
+    return test;
   }));
 })
