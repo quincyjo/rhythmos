@@ -9,16 +9,15 @@ export class SongsModel {
 
   constructor(private _database: DatabaseService) {}
 
-  private _checkStore(){
+  private _fetchSongs(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
       this._database.getAll('songs').then(
         (songs) => {
           this._songs = songs;
           resolve();
-        },
-        (error) => {
+        }, (error) => {
           this._init().then(() => {
-            this._checkStore().then( () => {
+            this._fetchSongs().then(() => {
               resolve();
             });
           });
@@ -28,9 +27,10 @@ export class SongsModel {
     return promise;
   }
 
-  private _init(){
+  private _init(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
-      this._database.createStore(1, (event) => {
+      let fill: boolean = false;
+      this._database.createStore(1, (event) => { // Create objectStore
         let objectStore = event.currentTarget.result.createObjectStore(
           'songs', {keyPath: 'id', autoIncrement: true});
         objectStore.createIndex("title", "title", {unique: false});
@@ -50,38 +50,39 @@ export class SongsModel {
         objectStore.createIndex("displaybpm", "displaybpm", {unique: false});
         objectStore.createIndex("selectable", "selectable", {unique: false});
         objectStore.createIndex("notes", "notes", {unique: false});
-      }).then( () => {
-        for (let song of SONGS) {
-          this._database.add('songs', song).then( () => {
-          }, (error) => {
-            console.log(error);
+        fill = true;
+      }).then( () => { // Resolve
+        if (fill) { // If initiated, fill with moch data
+          this._fillMockData().then(() => {
+            resolve();
           });
+        } else {
+          resolve();
         }
-        resolve();
+      },
+      (error) => {
+        reject(error);
       });
     });
     return promise;
   }
 
-  private _fetchSongs() {
+  private _fillMockData(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
-      this._init().then(() => {
-        this._database.getAll('songs').then((songs) => {
-          this._songs = songs;
-          console.log(this._songs);
-          resolve();
+      for (let song of SONGS) { // Fill with mock songs
+        this._database.add('songs', song).then( () => {
         }, (error) => {
           console.log(error);
-          reject(error);
         });
-      });
+      }
+      resolve();
     });
     return promise;
   }
 
-  public getSongs(){
+  public getSongs(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
-      this._checkStore().then(() => {
+      this._fetchSongs().then(() => {
         resolve(this._songs);
       });
     });
