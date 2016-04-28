@@ -10,6 +10,9 @@ export class SongProvider {
   constructor(private _model: SongsModel) {}
 
   getSongs() {
-    return Promise.resolve(this._model.getSongs());
+    let promise = new Promise<any>((resolve, reject) => {
+      this._model.getSongs().then((songs) => {resolve(songs);});
+    })
+    return promise;
   }
 }

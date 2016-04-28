@@ -27,6 +27,7 @@
     "./app/components/song-detail/song-detail.ts",
     "./app/components/song-wheel/song-wheel.spec.ts",
     "./app/components/song-wheel/song-wheel.ts",
+    "./app/models/mock-songs.ts",
     "./app/models/options-model.ts",
     "./app/models/songs-model.ts",
     "./app/options/options-detail.component.spec.ts",
