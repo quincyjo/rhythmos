@@ -4,168 +4,277 @@ import {SONGS} from '../song-provider/mock-songs';
 
 @Injectable()
 export class DatabaseService {
-  public name: string = 'Test';
-  private dbVer: number = 18;
+  private _utils: Utils;
+  private _db: any;
+  private _request: any;
+  private _wrapper: DBWrapper;
+
   constructor() {
-    let request = window.indexedDB.open("TestDB", this.dbVer);
-    request.onupgradeneeded = (event) => {
-      let db = (<IDBRequest>event.target).result;
-      if (db.objectStoreNames.contains("songs")) {
-        db.deleteObjectStore("songs");
-      }
-      let objectStore: IDBObjectStore = db.createObjectStore("songs", {keyPath: "id"});
-      objectStore.createIndex('title', 'title', {unique: false});
-      objectStore.createIndex('artist', 'artist', {unique: false});
-      objectStore.transaction.oncomplete = (event) => {
-        let songObjectStore = db.transaction("songs", "readwrite").objectStore("songs");
-        for (let i = 0; i < SONGS.length - 1; i++){
-          songObjectStore.add(SONGS[i]);
-        }
-      }
-    };
+    this._utils = new Utils();
+    this._wrapper = new DBWrapper("rhythmos", 1);
   }
 
-  get(obStore, index, key) {
-    return new Promise((resolve, reject) => {
-      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction([obStore]).objectStore(obStore);
-        let request;
-        if (index == objectStore.keyPath) {
-          request = objectStore.get(key);
-        } else {
-          request = objectStore.index(index).get(key);
-        }
-        request.onerror = (event) => {
-          reject("error in read")
-        };
-        request.onsuccess = (event) => {
-          let result = (<IDBRequest>event.target).result;
-          if (result) {
+  public createStore(version, upgradeCallBack): Promise<any> {
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.dbVersion = version;
+      let request = this._utils.indexedDB.open(this._wrapper.dbName,
+                                               version);
+      request.onsuccess = (e) => {
+        this._wrapper.db = request.result;
+        resolve();
+      };
+      request.onerror = (e) => {
+        reject('IndexedDB error: ' + e.target.errorCode);
+      };
+      request.onupgradeneeded = (e) => {
+        upgradeCallBack(e, this._wrapper.db);
+      };
+    });
+    return promise;
+  }
+
+  public getByKey(store: string, key: any): Promise<any> {
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readOnly,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
             resolve(result);
           }
-          else {
-            reject("Failed to retrieve data.")
-          }
-        };
-        request.onerror = () => {reject("Failed to retrieve data.")};
-      };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+        }),
+        objectStore = transaction.objectStore(store),
+        result,
+        request;
+      request = objectStore.get(key);
+      request.onsuccess = (event) => {
+        result = event.target.result;
+      }
     });
+    return promise;
   }
-  getAll(obStore, index?, key1?, key2 = key1) {
-    return new Promise((resolve, reject) => {
-      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db: IDBDatabase = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction([obStore]).objectStore(obStore);
-        if (!index) {
-          index = objectStore.keyPath;
-        }
-        let keyRange;
-        if (key1) {
-          keyRange = IDBKeyRange.bound(key1, key2);
-        }
-        let request;
-        if (index == objectStore.keyPath) {
-          request = objectStore.openCursor(keyRange);
-          request.onerror = () => {reject("Failed to retrieve data (keypath).")};
-        } else {
-          request = objectStore.index(index).openCursor(keyRange);
-          request.onerror = () => {reject("Failed to retrieve data. (index)")};
-        }
-        let result: Song[] = [];
-        request.onsuccess = (event) => {
-          let cursor = request.result;
-          if (cursor) {
-            result.push(cursor.value);
-            cursor.continue();
-          } else {
+
+  public getAll(store: string): Promise<any> {
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readOnly,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
             resolve(result);
           }
-        };
+        }),
+        objectStore = transaction.objectStore(store),
+        result = [],
+        request = objectStore.openCursor();
+      request.onerror = (e) => {
+        reject(e);
       };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+      request.onsuccess = (event) => {
+        var cursor = (<IDBOpenDBRequest>event.target).result;
+        if (cursor) {
+          result.push(cursor.value);
+          cursor["continue"]();
+        }
+      };
     });
+    return promise;
   }
 
-  put(obStore, data) {
-    return new Promise((resolve, reject) => {
-      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
-        objectStore.add(data);
-      };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+  public add(store: string, value: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readWrite,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
+            resolve({value: value});
+          }
+        }),
+        objectStore = transaction.objectStore(store);
+      objectStore.add(value);
     });
-  }
-  putAll(obStore, data) {
-  return new Promise((resolve, reject) => {
-    let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
-        for (let i = 0; i < data.length; i++){
-          objectStore.add(data[i]);
-        }
-      };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
-    });
+    return promise;
   }
 
-  delete(obStore, index,  key) {
-    return new Promise((resolve, reject) => {
-      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
-        let request;
-        if (index == objectStore.keyPath) {
-          request = objectStore.delete(key);
-        } else {
-          request = objectStore.index(index).delete(key);
-        }
-        request.onerror = (event) => {
-          reject("Could not delete " + key + " from " )
-        };
-      };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
-    });
+  public update(store: string, value: any, key: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readWrite,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
+            resolve(value);
+          },
+          abort: (e: Event) => {
+            reject(e);
+          }
+        }),
+        objectStore = transaction.objectStore(store);
+      objectStore.put(value, key);
+    })
+    return promise;
   }
-  deleteAll(obStore, index?, key1?, key2 = key1) {
-    return new Promise((resolve, reject) => {
-      let dbRequest = window.indexedDB.open("TestDB", this.dbVer);
-      dbRequest.onsuccess = (event) => {
-        let db: IDBDatabase = (<IDBRequest>event.target).result;
-        let objectStore = db.transaction(obStore, "readwrite").objectStore(obStore);
-        if (!index) {
-          index = objectStore.keyPath;
-        }
-        let keyRange;
-        if (key1) {
-          keyRange = IDBKeyRange.bound(key1, key2);
-        }
-        let request;
-        if (index == objectStore.keyPath) {
-          request = objectStore.openCursor(keyRange);
-        } else {
-          request = objectStore.index(index).openCursor(keyRange);
-        }
-        let result: Song[] = [];
-        request.onsuccess = (event) => {
-          let cursor = request.result;
-          if (cursor) {
-            cursor.delete();
-            cursor.continue();
-          } else {
+
+  public delete(store: string, key: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readWrite,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
             resolve();
+          },
+          abort: (e: Event) => {
+            reject(e);
           }
-        };
-        request.onerror = () => {reject("Failed to delete data.")};
+        }),
+        objectStore = transaction.objectStore(store);
+      objectStore["delete"](key);
+    })
+    return promise;
+  }
+
+  public openCursor(store: string, cursorCallback: (event) => void): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readOnly,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
+            resolve();
+          },
+          abort: (e: Event) => {
+            reject(e);
+          }
+        }),
+        objectStore = transaction.objectStore(store),
+        request = objectStore.openCursor();
+      request.onsuccess = (event) => {
+        cursorCallback(event);
+        resolve();
       };
-      dbRequest.onerror = () => {reject("Failed to connect to database.")};
+    })
+    return promise;
+  }
+
+  public clear(store: string, indexName: string, key: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readWrite,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
+            resolve();
+          },
+          abort: (e: Event) => {
+            reject(e);
+          }
+        }),
+        objectStore = transaction.objectStore(store);
+      objectStore.clear();
+      resolve();
+    })
+    return promise;
+  }
+
+  public getByIndex(store: string, indexName: string, key: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._wrapper.validateBeforeTransaction(store, reject);
+      let transaction = this._wrapper.createTransaction({
+          store: store,
+          mode: this._utils.dbMode.readOnly,
+          error: (e: Event) => {
+            reject(e);
+          },
+          complete: (e: Event) => {
+            resolve(result);
+          },
+          abort: (e: Event) => {
+            reject(e);
+          }
+        }),
+        result,
+        objectStore = transaction.objectStore(store),
+        index = objectStore.index(indexName),
+        request = index.get(key);
+      request.onsuccess = (event) => {
+        result = (<IDBOpenDBRequest>event.target).result;
+      };
     });
+    return promise;
+  }
+}
+
+class Utils {
+  dbMode: DbMode;
+  indexedDB: any;
+
+  constructor() {
+    this.indexedDB = window.indexedDB;
+      this.dbMode = {
+        readOnly: "readonly",
+        readWrite: "readwrite"
+      };
+  }
+}
+
+interface DbMode {
+  readOnly: string;
+  readWrite: string;
+}
+
+class DBWrapper {
+  public db: IDBDatabase;
+
+  constructor(public dbName: string, public dbVersion: number) {
+    this.db = null;
+  }
+
+  public validateStore(store: string) {
+    return this.db.objectStoreNames.contains(store);
+  }
+
+  public validateBeforeTransaction(store: string, reject) {
+    if (!this.db) { // No database created
+      reject('No database has been created.');
+    }
+    if (!this.validateStore(store)) { // No object store created
+      reject('Target objectStore uninitialized: ' + store);
+    }
+  }
+
+  public createTransaction(options: {
+                             store: string, mode: string,
+                             error: (e: Event) => any,
+                             complete: (e: Event) => any,
+                             abort?: (e: Event) => any})
+                           : IDBTransaction {
+    let txn: IDBTransaction = this.db.transaction(options.store, options.mode);
+    txn.onerror = options.error;
+    txn.oncomplete = options.complete;
+    txn.onabort = options.abort;
+    return txn;
   }
 }
