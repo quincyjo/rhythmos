@@ -23,6 +23,7 @@
   "files": [
     "./app/components/main-menu/main-menu.spec.ts",
     "./app/components/main-menu/main-menu.ts",
+    "./app/components/song-chart/song-chart.ts",
     "./app/components/song-detail/song-detail.spec.ts",
     "./app/components/song-detail/song-detail.ts",
     "./app/components/song-wheel/song-wheel.spec.ts",

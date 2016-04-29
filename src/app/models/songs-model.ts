@@ -115,7 +115,7 @@ export class SongsModel {
         let ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
         let dataURL = canvas.toDataURL("image/png");
-        dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+        //dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
         resolve(dataURL);
       };
       img.src = url;
@@ -130,6 +130,21 @@ export class SongsModel {
         resolve(this._songs);
       });
     });
+    return promise;
+  }
+
+  public getSongByKey(key: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._database.getByKey('songs', key).then((song) => {
+        resolve(song);
+      }, (error) => {
+        this._init().then(() => {
+          this.getSongByKey(key).then((song) => {
+            resolve(song);
+          });
+        });
+      });
+    })
     return promise;
   }
 }

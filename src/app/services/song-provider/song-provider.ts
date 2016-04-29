@@ -15,4 +15,13 @@ export class SongProvider {
     })
     return promise;
   }
+
+  public getById(id: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      this._model.getSongByKey(id).then((song) => {
+        resolve(song);
+      });
+    });
+    return promise;
+  }
 }
