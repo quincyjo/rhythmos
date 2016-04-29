@@ -27,7 +27,7 @@ export var SONGS = [
     banner: 'app/models/bn.png',
     background: 'app/models/bg.png',
     cdtitle: "",
-    music: 'app/models/Goin\'n Under.ogg',
+    music: 'app/models/audio.ogg',
     offset: 0,
     bpms: [210],
     stops: [],
