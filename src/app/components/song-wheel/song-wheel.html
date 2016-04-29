@@ -1,14 +1,30 @@
-<h2>{{title}}</h2>
-<div class="song-detail">
-  <song-detail [song]="selectedSong"></song-detail>
-</div>
-<div class="wheel">
-  <ul class="songs">
-    <li *ngFor="#song of songs"
-      class="song"
-      [class.selected]="song === selectedSong"
-      (click)="onSelect(song)">
-      <span class="badge">{{song.id}}</span> {{song.title}}
-    </li>
-  </ul>
+<div id="song-wheel"
+>
+  <div class="title">
+    <h1>Select Music:</h1>
+  </div>
+  <div id="body"[ngStyle]="{
+  'background-image': 'url(' + fetchBackground() + ')'
+}">
+    <div class="song-detail">
+      <song-detail [song]="getSelected()"></song-detail>
+    </div>
+    <div class="wheel">
+      <ul class="songs">
+        <li #item *ngFor="#song of songs; #i = index;"
+          (mouseenter)="select(i)"
+          class="song"
+          [ngClass]="{'selected': isSelected(i)}"
+          [routerLink]="['Play', {'id': song.id}]"
+          (click)="onSelect(song)">
+          <h2 class="song-title">{{song.title}}</h2>
+          <h3 class="song-cdtitle"
+            *ngIf="song.cdtitle">
+            {{song.cdtitle}}
+          </h3>
+          <h4 class="song-artist">~{{song.artist}}</h4>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

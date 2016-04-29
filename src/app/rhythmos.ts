@@ -14,6 +14,7 @@ import {OptionsRoot} from './options/options-root.component';
   selector: 'rhythmos-app',
   providers: [],
   templateUrl: 'app/rhythmos.html',
+  styleUrls: ['app/rhythmos.css'],
   directives: [ROUTER_DIRECTIVES, MainMenu],
   pipes: []
 })

@@ -1,0 +1,51 @@
+.song-detail{
+  margin:20px;
+  background:rgba(50,50,50,0.8);
+}
+
+.title{
+  box-sizing: border-box;
+  background:#fff;
+  height:30px;
+  color:#00b9d7;
+  overflow:hidden;
+  padding:0;
+  padding: 5px 0 0 5px;
+  margin:0;
+}
+
+.title h1{
+  padding:0;
+  margin:0;
+  font-size:1.3em;
+  color:#00b9d7;
+}
+
+h2.song-title{
+  color:#00b9d7;
+}
+
+#image-detail-banner{
+  box-sizing: border-box;
+  width:100%;
+}
+
+.chart-select{
+  height:75px;
+  width:75px;
+  background-color:#9856d6;
+  color:#fff;
+  float:right;
+}
+
+.chart-select .rating{
+  width:75px;
+  text-align:center;
+  font-size:50px;
+}
+
+.chart-select .difficulty{
+  text-transform: uppercase;
+  width:75px;
+  text-align:center;
+}

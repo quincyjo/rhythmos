@@ -1,9 +1,8 @@
-import {Component} from 'angular2/core';
+import {Component, Input, OnInit} from 'angular2/core';
 import {Song} from '../../shared/interfaces/song';
 
 @Component({
   selector: 'song-detail',
-  inputs: ['song'],
   templateUrl: 'app/components/song-detail/song-detail.html',
   styleUrls: ['app/components/song-detail/song-detail.css'],
   providers: [],
@@ -12,8 +11,9 @@ import {Song} from '../../shared/interfaces/song';
 })
 
 export class SongDetail {
-  public song: Song;
+  @Input() song: Song;
 
   constructor() {}
 
+  ngOnInit() {}
 }
