@@ -110,7 +110,7 @@ export class SongChart {
       for (let i = 0; i < measure.length; i++) {
         let line = measure[i];
         for (let j = 0; j < line.length; j++) {
-          if (line[j] == 1){
+          if (line[j] == 1 || line[j] == 2){
             this._tracks[j].steps.push(
               factory.createStep(i, measure.length)
             );
@@ -338,17 +338,35 @@ class StepFactory{
   public createStep(beat: number, time: number): Step {
     let offset: number;
     switch(time) {
+        case 3:
+          if (beat == 0) offset = 0
+          else offset = 256;
+          break;
         case 4:
           offset = 0;
           break;
+        case 6:
+          if (beat == 0 || beat == 3) offset = 0;
+          else offset = 256;
+          break;
         case 8:
-          if (beat % 2 == 0) offset = 0;
+          if ((beat & 1) == 0) offset = 0;
           else offset = 128;
           break;
+        case 9:
+          if (beat == 0 || beat == 3 || beat == 6) offset = 0;
+          else offset = 256;
+          break;
         case 16:
-          if(beat % 4 == 0) offset = 0;
-          else if (beat % 2 == 0) offset = 128;
+          if((beat & 3) == 0) offset = 0;
+          else if ((beat & 1) == 0) offset = 128;
           else offset = 384;
+          break;
+        case 32:
+          if ((beat & 7) == 0) offset = 0;
+          else if ((beat & 3) == 0) offset = 128;
+          else if ((beat & 1) == 0) offset = 384;
+          else offset = 640;
           break;
         default:
           offset = 896;
@@ -360,7 +378,7 @@ class StepFactory{
       sheight: 128,
       x: 0,
       y: 0,
-      target: start + (lastMeasureIndex + (beat/time)) * measureStep * 1000 + 150,
+      target: start + (lastMeasureIndex + (beat/time)) * measureStep * 1000 + 140,
       measure: lastMeasureIndex,
       beat: beat,
       time: time,
