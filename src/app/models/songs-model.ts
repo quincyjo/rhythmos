@@ -69,13 +69,56 @@ export class SongsModel {
 
   private _fillMockData(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
-      for (let song of SONGS) { // Fill with mock songs
-        this._database.add('songs', song).then( () => {
-        }, (error) => {
-          console.log(error);
-        });
+      let promises: Promise<any>[] = [];
+      for (let song of SONGS) {
+        promises.push(this._fetchBinaries(song));
       }
-      resolve();
+      Promise.all(promises).then((songs) => {
+        let promises: Promise<any>[] = [];
+        for (let song of songs) {
+          promises.push(this._database.add('songs', song));
+        }
+        Promise.all(promises).then(() => {
+          resolve();
+        });
+      });
+    });
+    return promise;
+  }
+
+  private _fetchBinaries(song: any): Promise<any>{
+    let promise = new Promise<any>((resolve, reject) => {
+      let promises: Promise<any>[] = [];
+      if(song.banner){
+        promises.push(this.getBase64FromImageUrl(song.banner));
+      }
+      if(song.background){
+        promises.push(this.getBase64FromImageUrl(song.background));
+      }
+      Promise.all(promises).then((values) => {
+        song.banner = values[0];
+        song.background = values[1];
+        resolve(song);
+      });
+    });
+    return promise;
+  }
+
+  public getBase64FromImageUrl(url: string) {
+    let promise = new Promise<any>((resolve, reject) => {
+      let img = new Image();
+      img.setAttribute('crossOrigin', 'anonymous');
+      img.onload = () => {
+        let canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        let dataURL = canvas.toDataURL("image/png");
+        dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+        resolve(dataURL);
+      };
+      img.src = url;
     });
     return promise;
   }
@@ -83,6 +126,7 @@ export class SongsModel {
   public getSongs(): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
       this._fetchSongs().then(() => {
+        console.log(this._songs);
         resolve(this._songs);
       });
     });
