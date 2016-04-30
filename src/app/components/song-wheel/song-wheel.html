@@ -4,24 +4,21 @@
     <h1>Select Music:</h1>
   </div>
   <div id="body"[ngStyle]="{
-  'background-image': 'url(' + fetchBackground() + ')'
+  'background': fetchBackground()
 }">
     <div class="song-detail">
       <song-detail [song]="getSelected()"></song-detail>
     </div>
     <div class="wheel">
       <ul class="songs">
-        <li #item *ngFor="#song of songs; #i = index;"
+        <li class="song" #item
+          *ngFor="#song of songs; #i = index;"
           (mouseenter)="select(i)"
-          class="song"
           [ngClass]="{'selected': isSelected(i)}"
           [routerLink]="['Play', {'id': song.id}]"
           (click)="onSelect(song)">
           <h2 class="song-title">{{song.title}}</h2>
-          <h3 class="song-cdtitle"
-            *ngIf="song.cdtitle">
-            {{song.cdtitle}}
-          </h3>
+          <h3 class="song-subtitle">{{song.subtitle}}</h3>
           <h4 class="song-artist">~{{song.artist}}</h4>
         </li>
       </ul>

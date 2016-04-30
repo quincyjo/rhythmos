@@ -12,6 +12,7 @@ let audio: any;
 let measure: any;
 let measureStep: number;
 let factory: StepFactory;
+let scoreBoard: ScoreBoard;
 let lastMeasureIndex: number;
 let start: number;
 
@@ -47,13 +48,14 @@ export class SongChart {
   ngOnInit() {
     let id = +this._routeParams.get('id');
     factory = new StepFactory();
+    scoreBoard = new ScoreBoard();
     this._keys = [0, 0, 0, 0];
     this._canvas = <HTMLCanvasElement>document.getElementById('chart');
     this._canvas.width = window.innerWidth;
     this._canvas.height = window.innerHeight;
     this._songProvider.getById(id).then((song) => {
       this.song = song;
-      measureStep = (1 / (this.song.bpms[0] / 60)) * 4;
+      measureStep = (1 / (this.song.bpms[0] / 60)) * 4000;
       this._loadAssets().then(() => {
         this._buildStage().then(() => {
           this.start();
@@ -67,7 +69,7 @@ export class SongChart {
     this._lastTick = Date.now();
     this._start = this._lastTick;
     start = this._lastTick;
-    audio.play();
+    //audio.play();
     this._runningTime = 0;
     this._run();
   }
@@ -92,6 +94,7 @@ export class SongChart {
     this._drawBg();
     for (let track of this._tracks)
       track.draw();
+    scoreBoard.drawSplash(this._canvas);
   }
 
   private _update(modifier: number) {
@@ -102,11 +105,10 @@ export class SongChart {
   }
 
   private _updateMeasure() {
-    let index = Math.floor(this._runningTime / 1000 / measureStep) + 2;
+    let index = Math.floor(this._runningTime / measureStep) + 2;
     if (index != lastMeasureIndex) {
       lastMeasureIndex = index;
       measure = this.song.notes.notes[index];
-      //console.log(measure);
       for (let i = 0; i < measure.length; i++) {
         let line = measure[i];
         for (let j = 0; j < line.length; j++) {
@@ -165,13 +167,11 @@ export class SongChart {
   private _pressKey(index: number) {
     if(this._keys[index] == 0) {
       this._keys[index] = Date.now();
-      //console.log(this._keys[index]);
     }
   }
 
   private _releaseKey(index: number) {
     this._keys[index] = 0;
-    //console.log(this._keys[index]);
   }
 
   private _loadAssets() {
@@ -257,29 +257,32 @@ class Track{
   private _img;
   private _flash;
   private _glow;
+  private _held;
+  private _delta: number;
   public steps: Step[];
 
   constructor(public rotation: number, public cxt: any, public offset: number) {
     this._img = receptor;
     this._flash = false;
-    this._glow = false;
+    this._held = false;
     this.steps = [];
   }
 
   public update(keystate: number, modifier: number) {
     if(keystate) {
-      let delta = Date.now() - keystate;
-      if(delta < 50){
+      if(!this._held){
+        this._held = true;
+        this._checkStep(keystate);
+      }
+      this._delta = Date.now() - keystate;
+      if(this._delta < 100){
         this._flash = true;
-        this._glow = false;
       } else {
-        this._glow = true;
         this._flash = false;
       }
-      this._checkStep();
     } else {
+      this._held = false;
       this._flash = false;
-      this._glow = false;
     }
   }
 
@@ -288,16 +291,26 @@ class Track{
     this.cxt.translate(64 + this.offset, 64 + 32);
     this.cxt.rotate(this.rotation);
     this.cxt.drawImage(this._img, -(this._img.width/2), -(this._img.height/2));
-    if(this._flash) this.cxt.drawImage(flash, -(flash.width/2), -(flash.height/2));
-    if(this._glow) this.cxt.drawImage(glow, -(glow.width/2), -(glow.height/2));
+    if(this._held) {
+      this.cxt.globalAlpha = this._delta / 50;
+      this.cxt.drawImage(glow, -(glow.width/2), -(glow.height/2));
+    }
+    if(this._flash){
+      this.cxt.globalAlpha = 1 - this._delta / 100;
+      this.cxt.drawImage(flash, -(flash.width/2), -(flash.height/2));
+    }
+    this.cxt.globalAlpha = 1;
     this.cxt.restore();
     this._drawSteps();
   }
 
-  private _checkStep() {
-    if (this.steps[0] && Math.abs(Date.now() - this.steps[0].target) < 22.5){
-      this.steps.splice(0, 1);
-      console.log("HIT");
+  private _checkStep(hit: number) {
+    if (this.steps[0]){
+      let step = this.steps[0];
+      if (step.target - hit < 180){
+        scoreBoard.score(step.target, hit);
+        this.steps.splice(0, 1);
+      }
     }
   }
 
@@ -307,10 +320,10 @@ class Track{
       step = this.steps[i];
       if (step.target - Date.now() < -200){
         this.steps.splice(i, 1);
+        scoreBoard.miss();
       } else {
         this.cxt.save();
         this.cxt.translate(64 + this.offset, 64 + 32 + (step.target - Date.now()));
-        //console.log(step.target);
         this.cxt.rotate(this.rotation);
         this.cxt.drawImage(arrow, step.sx, step.sy, step.swidth, step.sheight, -64, -64, 128, 128)
         this.cxt.restore();
@@ -378,10 +391,132 @@ class StepFactory{
       sheight: 128,
       x: 0,
       y: 0,
-      target: start + (lastMeasureIndex + (beat/time)) * measureStep * 1000 + 140,
+      target: start + (lastMeasureIndex + (beat/time)) * measureStep,
       measure: lastMeasureIndex,
       beat: beat,
       time: time,
     };
+  }
+}
+
+class ScoreBoard{
+  private _life: number;
+  private _score: number;
+  private _combo: number;
+  private _flawless: number;
+  private _perfect: number;
+  private _great: number;
+  private _good: number;
+  private _bad: number;
+  private _boo: number;
+  private _poor: number;
+  private _lastScore: string;
+
+  constructor() {
+    this._life = this._score = this._combo = this._flawless = this._perfect =
+    this._great = this._good = this._bad = this._boo = this._poor = 0;
+  }
+
+  public score(target: number, hit: number){
+    let delta = target - hit;
+    delta = Math.abs(delta);
+    if (delta < 22.5) { // Flawless
+      this._flawless++;
+      this._combo++;
+      this._score += 2;
+      this._life += 2;
+      this._lastScore = 'marvelous';
+    } else
+    if (delta < 45) { // Perfect
+      this._perfect++;
+      this._combo++;
+      this._score += 2;
+      this._life += 2;
+      this._lastScore = 'perfect';
+    } else
+    if (delta < 90) { // Great
+      this._great++;
+      this._combo++;
+      this._score += 1;
+      this._life += 2;
+      this._lastScore = 'great';
+    } else
+    if (delta < 135) { // Good
+      this._good++;
+      this._combo = 0;
+      this._lastScore = 'good';
+    } else
+    if (delta < 150) { // Bad
+      this._bad++;
+      this._combo = 0;
+      this._life -= 2;
+      this._score -= 4;
+      this._lastScore = 'bad';
+    } else
+    if (delta < 180) { // Boo
+      this._boo++;
+      this._combo = 0;
+      this._life -= 2;
+      this._score -= 4;
+      this._lastScore = 'boo';
+    } else {           // Poor
+      this._poor++;
+      this._combo = 0;
+      this._life -= 8;
+      this._score -= 8;
+      this._lastScore = 'miss';
+    }
+    console.log(this._score);
+  }
+
+  public miss() {
+      this._poor++;
+      this._combo = 0;
+      this._life -= 8;
+      this._score -= 8;
+      this._lastScore = 'miss';
+  }
+
+  public drawSplash(canvas: HTMLCanvasElement) {
+    if (this._lastScore){
+      this._drawLast(canvas);
+    }
+    if (this._combo){
+      this._drawCombo(canvas);
+    }
+  }
+
+  private _drawLast(canvas: HTMLCanvasElement) {
+      let mid = canvas.height / 2 - 40;
+      let cxt = canvas.getContext('2d');
+      cxt.save();
+      cxt.font = "50px Helvetica";
+      cxt.textAlign = "center";
+      cxt.fillStyle = "#000";
+      cxt.strokeText(this._lastScore, 350, mid);
+      cxt.fillStyle = "#000";
+      let grad= cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
+      grad.addColorStop(0,"white");
+      grad.addColorStop(1,"black");
+      cxt.fillStyle = grad;
+      cxt.fillText(this._lastScore, 350, mid);
+      cxt.restore();
+  }
+
+  private _drawCombo(canvas: HTMLCanvasElement) {
+      let mid = canvas.height / 2;
+      let cxt = canvas.getContext('2d');
+      cxt.save();
+      cxt.font = "40px Helvetica";
+      cxt.textAlign = "center";
+      cxt.fillStyle = "#000";
+      cxt.strokeText("Combo " + this._combo, 350, mid);
+      cxt.fillStyle = "#000";
+      let grad= cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
+      grad.addColorStop(0,"white");
+      grad.addColorStop(1,"black");
+      cxt.fillStyle = grad;
+      cxt.fillText("Combo " + this._combo, 350, mid);
+      cxt.restore();
   }
 }

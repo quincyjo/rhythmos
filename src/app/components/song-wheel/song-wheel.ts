@@ -13,7 +13,7 @@ import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
   directives: [ROUTER_DIRECTIVES, SongDetail],
   pipes: [],
   host: {
-    '(document:keyup)': '_keyup($event)'
+    '(document:keydown)': '_keydown($event)'
   }
 })
 export class SongWheel {
@@ -46,9 +46,12 @@ export class SongWheel {
 
   public fetchBackground() {
     if(this.songs && this.songs[this.activeIndex]){
-      return this.songs[this.activeIndex].background;
+      let url = this.songs[this.activeIndex].background;
+      return `
+        radial-gradient(rgba(0,0,0,0.25), black),
+        url("` + url + '")';
     } else {
-      return "app/images/back0.png";
+      return "#000";
     }
   }
 
@@ -62,7 +65,7 @@ export class SongWheel {
     else return null;
   }
 
-  private _keyup(event: any){
+  private _keydown(event: any){
     switch(event.keyCode){
       case 13: // Enter
         this._keyEnter();

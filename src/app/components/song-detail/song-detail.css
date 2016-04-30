@@ -1,5 +1,4 @@
 .song-detail{
-  margin:20px;
   background:rgba(50,50,50,0.8);
 }
 
@@ -23,6 +22,12 @@
 
 h2.song-title{
   color:#00b9d7;
+}
+
+.banner-container {
+  width:100%;
+  height:250px;
+  overflow:hidden;
 }
 
 #image-detail-banner{
