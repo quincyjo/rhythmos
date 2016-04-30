@@ -58,20 +58,48 @@ export class SongChart {
       measureStep = (1 / (this.song.bpms[0] / 60)) * 4000;
       this._loadAssets().then(() => {
         this._buildStage().then(() => {
-          this.start();
-        })
+          this._fadeIn(1000).then(() => {
+            this.start();
+          });
+        });
       });
     });
   }
 
   public start() {
-    var lastMeasureIndex = -1;
+    lastMeasureIndex = -1;
     this._lastTick = Date.now();
     this._start = this._lastTick;
     start = this._lastTick;
-    //audio.play();
     this._runningTime = 0;
+    audio.play();
     this._run();
+  }
+
+  private _fadeIn(length: number) {
+    let promise = new Promise<any>((resolve, reject) => {
+      let start = Date.now();
+      let fin = start + length;
+      let run = () => {
+        if (Date.now() < fin) {
+          requestAnimationFrame(() => {
+            this._fadeStep(1 - (Date.now() - start) / length);
+            run();
+          })
+        } else resolve();
+      }
+      run();
+    })
+    return promise;
+  }
+
+  private _fadeStep(mod: number) {
+    this._render();
+    let cxt = this._canvas.getContext('2d');
+    cxt.globalAlpha = mod;
+    cxt.fillStyle = '#000000';
+    cxt.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    cxt.globalAlpha = 1;
   }
 
   private _run() {
@@ -237,10 +265,10 @@ export class SongChart {
   private _buildTracks() {
     let promise = new Promise<any>((resolve, reject) => {
       this._tracks = [
-        new Track(90 * Math.PI / 180, this._canvas.getContext('2d'), 32),
+        new Track(0.5 * Math.PI , this._canvas.getContext('2d'), 32),
         new Track(0, this._canvas.getContext('2d'), 32+128+32),
-        new Track(180 * Math.PI / 180, this._canvas.getContext('2d'), 32+128+32+128+32),
-        new Track(270 * Math.PI / 180, this._canvas.getContext('2d'), 32+128+32+128+32+128+32)
+        new Track(1.0 * Math.PI , this._canvas.getContext('2d'), 32+128+32+128+32),
+        new Track(1.5 * Math.PI , this._canvas.getContext('2d'), 32+128+32+128+32+128+32)
       ];
       resolve();
     });
