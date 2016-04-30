@@ -15,6 +15,7 @@ let factory: StepFactory;
 let scoreBoard: ScoreBoard;
 let lastMeasureIndex: number;
 let start: number;
+let measureOffset: number;
 
 @Component({
   selector: 'song-chart',
@@ -38,6 +39,7 @@ export class SongChart {
     private _lastTick: number;
     private _thisTick: number;
     private _runningTime: number;
+    private _continue: boolean;
 
   constructor(
     private _songProvider: SongProvider,
@@ -53,13 +55,15 @@ export class SongChart {
     this._canvas = <HTMLCanvasElement>document.getElementById('chart');
     this._canvas.width = window.innerWidth;
     this._canvas.height = window.innerHeight;
-    this._songProvider.getById(id).then((song) => {
+    this._songProvider.getById(id).then((song) => { // Get song
       this.song = song;
-      measureStep = (1 / (this.song.bpms[0] / 60)) * 4000;
-      this._loadAssets().then(() => {
-        this._buildStage().then(() => {
-          this._fadeIn(1000).then(() => {
-            this.start();
+      measureStep = (1 / (this.song.bpms[0] / 60) * 4000);
+      measureOffset = Math.ceil(2000 / measureStep);
+      this._loadAssets().then(() => {               // Preload assets
+        this._buildStage().then(() => {             // Create stage objects
+          this._prerenderMeasures();                // Prerender measures
+          this._fadeIn(1000).then(() => {           // Fade in
+            setTimeout(this.start(), 1000);         // Start song
           });
         });
       });
@@ -67,6 +71,7 @@ export class SongChart {
   }
 
   public start() {
+    this._continue = true;
     lastMeasureIndex = -1;
     this._lastTick = Date.now();
     this._start = this._lastTick;
@@ -103,10 +108,11 @@ export class SongChart {
   }
 
   private _run() {
-    requestAnimationFrame(() => {
-      this._tick();
-      this._run();
-    });
+    if (this._continue)
+      requestAnimationFrame(() => {
+        this._tick();
+        this._run();
+      });
   }
 
   private _tick() {
@@ -132,10 +138,21 @@ export class SongChart {
     }
   }
 
+  private _prerenderMeasures(){
+    for(let i = 0; i < measureOffset; i++) {
+      this._loadMeasure(i);
+    }
+  }
+
   private _updateMeasure() {
-    let index = Math.floor(this._runningTime / measureStep) + 2;
-    if (index != lastMeasureIndex) {
+    let index = Math.floor(this._runningTime / measureStep) + measureOffset;
+    if (index != lastMeasureIndex && index < this.song.notes.notes.length) {
       lastMeasureIndex = index;
+      this._loadMeasure(index);
+    }
+  }
+
+  private _loadMeasure(index: number) {
       measure = this.song.notes.notes[index];
       for (let i = 0; i < measure.length; i++) {
         let line = measure[i];
@@ -147,7 +164,6 @@ export class SongChart {
           }
         }
       }
-    }
   }
 
   private _keydown(event: any){
@@ -494,7 +510,6 @@ class ScoreBoard{
       this._score -= 8;
       this._lastScore = 'miss';
     }
-    console.log(this._score);
   }
 
   public miss() {
