@@ -101,7 +101,7 @@ export class SongChart {
   private _fadeStep(mod: number) {
     this._render();
     let cxt = this._canvas.getContext('2d');
-    cxt.globalAlpha = mod;
+    cxt.globalAlpha = mod < 0 ? 0 : mod;
     cxt.fillStyle = '#000000';
     cxt.fillRect(0, 0, this._canvas.width, this._canvas.height);
     cxt.globalAlpha = 1;
@@ -250,15 +250,28 @@ export class SongChart {
         glow.src = 'app/images/glow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
-        bg = new Image;
-        bg.onload = () => {
+        if (this.song.background === false) {
+          bg = false;
           resolve();
+        } else {
+          bg = new Image;
+          bg.onload = () => {
+            resolve();
+          }
+          if (this.song.background === true) {
+            this._songProvider.getBackground(this.song).then((background) => {
+              bg.src = background;
+            });
+          } else {
+            bg.src = this.song.background;
+          }
         }
-        bg.src = this.song.background;
       }));
       promises.push(new Promise<any>((resolve, reject) => {
-        audio = new Audio(this.song.music);
-        resolve();
+        this._songProvider.getMusic(this.song).then((url) => {
+          audio = new Audio(url);
+          resolve();
+        });
       }));
       Promise.all(promises).then(() => {
         resolve();
@@ -282,9 +295,9 @@ export class SongChart {
     let promise = new Promise<any>((resolve, reject) => {
       this._tracks = [
         new Track(0.5 * Math.PI , this._canvas.getContext('2d'), 32),
-        new Track(0, this._canvas.getContext('2d'), 32+128+32),
-        new Track(1.0 * Math.PI , this._canvas.getContext('2d'), 32+128+32+128+32),
-        new Track(1.5 * Math.PI , this._canvas.getContext('2d'), 32+128+32+128+32+128+32)
+        new Track(0, this._canvas.getContext('2d'), 32+128+16),
+        new Track(1.0 * Math.PI , this._canvas.getContext('2d'), 32+128+16+128+16),
+        new Track(1.5 * Math.PI , this._canvas.getContext('2d'), 32+128+16+128+16+128+16)
       ];
       resolve();
     });
@@ -292,8 +305,10 @@ export class SongChart {
   }
 
   private _drawBg() {
+    if (bg) {
     this._canvas.getContext('2d').drawImage(bg, 0, 0, bg.width, bg.height,
                                             0, 0, this._canvas.width, this._canvas.height);
+    }
   }
 }
 

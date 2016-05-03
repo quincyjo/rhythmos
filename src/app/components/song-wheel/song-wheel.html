@@ -3,9 +3,11 @@
   <div class="title">
     <h1>Select Music:</h1>
   </div>
-  <div id="body"[ngStyle]="{
-  'background': fetchBackground()
-}">
+  <div class="content">
+    <div class="background"
+    [ngStyle]="{
+      'background': bg
+    }"></div>
     <div class="song-detail">
       <song-detail [song]="getSelected()"></song-detail>
     </div>

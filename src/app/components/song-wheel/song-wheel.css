@@ -4,14 +4,32 @@
   padding:0;
 }
 
-#body{
-  height:600px;
-  border-bottom:5px solid #00b9d7;
-  box-shadow: inset 0 100px 100px -100px rgba(0,0,0,0.75),
-    inset 0 -100px 100px -100px rgba(0,0,0,0.75);
+#song-wheel{
+  position:absolute;
+  top:0;
+  left:0;
+  display:flex;
+  flex-flow:column;
+  width:100%;
+  height:100%;
 }
 
-.title{
+#song-wheel .row {
+  flex: 0 1 30px;
+}
+
+.background{
+  position:absolute;
+  top:0;
+  left:0;
+  z-index: -1;
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+#song-wheel .title{
+  flex: 0 1 auto;
   box-sizing: border-box;
   background:#fff;
   height:50px;
@@ -23,6 +41,13 @@
   margin:0;
 }
 
+.content{
+  flex: 1 1 auto;
+  border-bottom:5px solid #00b9d7;
+  box-shadow: inset 0 100px 100px -100px rgba(0,0,0,0.75),
+    inset 0 -100px 100px -100px rgba(0,0,0,0.75);
+}
+
 .title h1{
   padding:0;
   margin:0;
@@ -31,11 +56,16 @@
 }
 
 .wheel {
+  max-width:500px;
   float: right;
   width: 40%;
   height: 100%;
   border-left:5px solid #fff;
   background:rgba(50,50,50,0.75);
+}
+
+.wheel ul.songs {
+  width: 100%;
 }
 
 .wheel ul.songs li.song {
@@ -78,6 +108,7 @@ h4.song-artist{
 }
 
 .song-detail{
+  max-width:800px;
   padding:25px 75px 25px 25px;
   margin:0;
   float:left;

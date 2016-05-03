@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from 'angular2/core';
+import {SongProvider} from '../../services/song-provider/song-provider';
 import {Song} from '../../shared/interfaces/song';
 
 @Component({
@@ -13,7 +14,22 @@ import {Song} from '../../shared/interfaces/song';
 export class SongDetail {
   @Input() song: Song;
 
-  constructor() {}
+  constructor(private _songProvider: SongProvider) {}
 
   ngOnInit() {}
+
+  public fetchBanner() {
+    if (this.song.banner === true) {
+      this._songProvider.getBanner(this.song).then((banner) => {
+        this.song.banner = banner;
+        let url = this.song.banner;
+        return 'url("' + url + '") 50% 50% / cover no-repeat';
+      });
+    } else if (this.song.banner) {
+      let url = this.song.banner;
+      return 'url("' + url + '") 50% 50% / cover no-repeat';
+    } else {
+      return '#000';
+    }
+  }
 }

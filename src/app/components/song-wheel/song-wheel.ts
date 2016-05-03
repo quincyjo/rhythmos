@@ -21,6 +21,7 @@ export class SongWheel {
   public songs: Song[];
   public selectedSong: Song;
   public activeIndex: number;
+  public bg: any;
 
   constructor(private _songProvider: SongProvider,
               private _router: Router) {}
@@ -32,8 +33,10 @@ export class SongWheel {
   }
 
   ngOnInit() {
-    this.getSongs();
-    this.activeIndex = 0;
+    this._songProvider.getSongs().then(songs => {
+      this.songs = songs;
+      this.select(0);
+    });
   }
 
   onSelect(song: Song) {
@@ -42,16 +45,26 @@ export class SongWheel {
 
   public select(index: number) {
     this.activeIndex = index;
+    this.fetchBackground();
   }
 
   public fetchBackground() {
-    if(this.songs && this.songs[this.activeIndex]){
-      let url = this.songs[this.activeIndex].background;
-      return `
-        radial-gradient(rgba(0,0,0,0.25), black),
-        url("` + url + '")';
+    if(this.songs
+    && this.songs[this.activeIndex]){
+      let song = this.songs[this.activeIndex];
+      if (song.background === true) {
+        this._songProvider.getBackground(song).then((background) => {
+          this.bg = `
+            radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
+            url("` + song.background + '") 50% 50% / cover no-repeat';
+        });
+      } else {
+        this.bg = `
+          radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
+            url("` + song.background + '") 50% 50% / cover no-repeat';
+      }
     } else {
-      return "#000";
+      this.bg = "#000";
     }
   }
 
@@ -87,10 +100,10 @@ export class SongWheel {
   }
 
   private _keyDownArrow(){
-    this.activeIndex = (++this.activeIndex % this.songs.length);
+    this.select(++this.activeIndex % this.songs.length);
   }
 
   private _keyUpArrow(){
-    this.activeIndex = --this.activeIndex < 0 ? this.songs.length + this.activeIndex : this.activeIndex;
+    this.select(--this.activeIndex < 0 ? this.songs.length + this.activeIndex : this.activeIndex);
   }
 }

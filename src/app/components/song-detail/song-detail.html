@@ -2,8 +2,9 @@
   <div class="title">
     <h1>Song Info</h1>
   </div>
-  <div class="banner-container">
-    <img id="image-detail-banner" src="{{song.banner}}"/>
+  <div class="banner-container" [ngStyle]="{
+    'background': fetchBanner()
+  }">
   </div>
   <h2 class="song-title">{{song.title}}</h2>
   <h3>{{song.subtitle}}</h3>

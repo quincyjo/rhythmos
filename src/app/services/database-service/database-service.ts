@@ -14,11 +14,25 @@ export class DatabaseService {
     this._wrapper = new DBWrapper("rhythmos", 1);
   }
 
+  public deleteDB() {
+    let promise = new Promise<any>((resolve, reject) => {
+      let request = this._utils.indexedDB.deleteDatabase('rhythmos');
+      request.onsuccess = (e) => {
+        console.log("deleted DB");
+        resolve();
+      };
+      request.onerror = (e) => {
+        reject("error deleting database");
+      };
+    });
+    return promise;
+  }
+
   public createStore(version, upgradeCallBack): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      this._wrapper.dbVersion = version;
+      this._wrapper.dbVersion++;
       let request = this._utils.indexedDB.open(this._wrapper.dbName,
-                                               version);
+                                               this._wrapper.dbVersion);
       request.onsuccess = (e) => {
         this._wrapper.db = request.result;
         resolve();
@@ -87,9 +101,10 @@ export class DatabaseService {
     return promise;
   }
 
-  public add(store: string, value: any): Promise<any>{
+  public add(store: string, value: any, key?: any): Promise<any>{
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
+      let request;
       let transaction = this._wrapper.createTransaction({
           store: store,
           mode: this._utils.dbMode.readWrite,
@@ -97,11 +112,12 @@ export class DatabaseService {
             reject(e);
           },
           complete: (e: Event) => {
-            resolve({value: value});
+            resolve({value: value, key: key});
           }
         }),
         objectStore = transaction.objectStore(store);
-      objectStore.add(value);
+      request = key ? objectStore.add(value, key) : objectStore.add(value);
+      request.onsuccess = (event) => {key = event.target.result};
     });
     return promise;
   }
