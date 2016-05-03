@@ -1,23 +1,24 @@
 <div class="song-detail" *ngIf="song">
-  <div class="title">
-    <h1>Song Info</h1>
+  <div class="banner-container">
+    <div class="banner" [ngStyle]="{
+      'background': fetchBanner()
+      }">
+      <h2 class="song-title">{{song.title}}</h2>
+    </div>
+    <div class="chart-container">
+      <div class="chart-select">
+        <span class="rating">
+        {{song.notes.rating}}
+        </span>
+          <span class="difficulty">
+            {{song.notes.difficulty}}
+          </span>
+      </div>
+    </div>
   </div>
-  <div class="banner-container" [ngStyle]="{
-    'background': fetchBanner()
-  }">
-  </div>
-  <h2 class="song-title">{{song.title}}</h2>
   <h3>{{song.subtitle}}</h3>
   <h3>{{song.artist}}</h3>
   <h4>{{song.cdtitle}}</h4>
   <h4>{{song.genre}}</h4>
   <h3>{{song.bpm}}</h3>
-  <div class="chart-select">
-    <span class="rating">
-    {{song.notes.rating}}
-    </span>
-    <span class="difficulty">
-      {{song.notes.difficulty}}
-    </span>
-  </div>
 </div>

@@ -1,5 +1,6 @@
 .song-detail {
-  background: rgba(50,50,50,0.8);
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -21,21 +22,48 @@
 }
 
 h2.song-title {
-  color: #00b9d7;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  display: block;
+  width: 100%;
+  height: 30px;
+  opacity: 0.8;
+  margin: 0;
+  padding: 0 10px;
+  background: #000;
+  color: #ddd;
+  font-size: 1em;
+  line-height: 30px;
+  vertical-align: middle;
 }
 
 .banner-container {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: row;
+}
+
+.chart-container {
+  flex: 0 1 85px;
+  padding-left: 10px;
+}
+
+.banner {
+  flex: 1 1 auto;
+  position: relative;
   width: 100%;
-  height: 150px;
+  height: 180px;
   overflow: hidden;
 }
 
 .chart-select {
-  height: 75px;
-  width: 75px;
+  height: 50px;
+  width: 55px;
   background-color: #9856d6;
   color: #fff;
-  float: right;
+  position: relative;
+  padding-left: 20px;
 }
 
 .chart-select .rating {
@@ -45,7 +73,17 @@ h2.song-title {
 }
 
 .chart-select .difficulty {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  transform: rotate(90deg);
+	transform-origin: left top 0;
+  float: left;
   text-transform: uppercase;
-  width: 75px;
+  height:20px;
+  width: 50px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0;
+  margin: 0;
   text-align: center;
 }

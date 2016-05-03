@@ -18,16 +18,6 @@
   flex: 0 1 30px;
 }
 
-.background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 #song-wheel .title {
   flex: 0 1 auto;
   box-sizing: border-box;
@@ -41,11 +31,31 @@
   margin: 0;
 }
 
+.background {
+  transition: linear 1s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  -webkit-filter: blur(5px);
+}
+
 .content {
+  position: relative;
   flex: 1 1 auto;
-  border-bottom: 5px solid #00b9d7;
+  display: flex;
+  flex-flow: row;
   box-shadow: inset 0 100px 100px -100px rgba(0,0,0,0.75),
     inset 0 -100px 100px -100px rgba(0,0,0,0.75);
+}
+
+.footer {
+  flex: 0 1 25px;
+  border-top: 5px solid #00b9d7;
+  background:#fff;
 }
 
 .title h1 {
@@ -56,16 +66,27 @@
 }
 
 .wheel {
-  max-width: 500px;
-  float: right;
-  width: 40%;
-  height: 100%;
+  padding: 0;
+  margin: 0;
+  flex: 0 1 50%;
   border-left: 5px solid #fff;
+  max-width: 500px;
   background: rgba(50,50,50,0.75);
+  margin-left: auto;
+  box-shadow: -100px 0 100px -100px rgba(0,0,0,0.75);
+}
+
+.song-detail {
+  flex: 0 1 50%;
+  max-width: 600px;
+  margin: 25px auto;
 }
 
 .wheel ul.songs {
+  margin: 0;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .wheel ul.songs li.song {
@@ -78,6 +99,13 @@
   cursor: pointer;
   position: relative;
   height: 60px;
+  background-size: 200% 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25)) 0% 100%/200% 100%;
+  transition: background-position 0.25s;
+}
+
+.wheel ul.songs li.song.selected {
+  background-position: 100% 0;
 }
 
 h2.song-title {
@@ -101,16 +129,4 @@ h4.song-artist {
   position: absolute;
   right: 5px;
   bottom: 3px;
-}
-
-.wheel ul.songs li.song.selected {
-  background: rgba(255,255,255,0.25);
-}
-
-.song-detail {
-  max-width: 800px;
-  padding: 25px 75px 25px 25px;
-  margin: 0;
-  float: left;
-  width: 60%;
 }
