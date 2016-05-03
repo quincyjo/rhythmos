@@ -21,18 +21,14 @@ export class OptionsListComponent implements OnInit {
 
   ngOnInit() {
     let id = +this._routeParams.get('id');
-    console.log("Got id:", id);
     if (id) {
-      console.log("Getting option with id", id);
       this._optionsProvider.get(id).then(option => {
         this.option = option;
         this.options = this.option["children"];
       });
     } else {
-      console.log("Getting base options.");
       this._optionsProvider.getOptions().then(options => {
         this.options = options;
-        console.log(this.options);
       });
     }
   }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from 'angular2/core';
+import {Component, Input} from 'angular2/core';
 import {SongProvider} from '../../services/song-provider/song-provider';
 import {Song} from '../../shared/interfaces/song';
 

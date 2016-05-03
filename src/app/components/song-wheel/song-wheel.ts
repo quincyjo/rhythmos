@@ -1,9 +1,8 @@
-import {Component} from 'angular2/core';
-import {OnInit} from 'angular2/core';
+import {Component, HostListener} from 'angular2/core';
+import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
 import {Song} from '../../shared/interfaces/song';
 import {SongDetail} from '../song-detail/song-detail';
 import {SongProvider} from '../../services/song-provider/song-provider';
-import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
 
 @Component({
   selector: 'song-wheel',
@@ -11,10 +10,7 @@ import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
   styleUrls: ['app/components/song-wheel/song-wheel.css'],
   providers: [SongProvider],
   directives: [ROUTER_DIRECTIVES, SongDetail],
-  pipes: [],
-  host: {
-    '(document:keydown)': '_keydown($event)'
-  }
+  pipes: []
 })
 export class SongWheel {
   public title = 'Songs';
@@ -49,8 +45,8 @@ export class SongWheel {
   }
 
   public fetchBackground() {
-    if(this.songs
-    && this.songs[this.activeIndex]){
+    if (this.songs
+    && this.songs[this.activeIndex]) {
       let song = this.songs[this.activeIndex];
       if (song.background === true) {
         this._songProvider.getBackground(song).then((background) => {
@@ -64,7 +60,7 @@ export class SongWheel {
             url("` + song.background + '") 50% 50% / cover no-repeat';
       }
     } else {
-      this.bg = "#000";
+      this.bg = '#000';
     }
   }
 
@@ -73,13 +69,16 @@ export class SongWheel {
   }
 
   public getSelected() {
-    if(this.songs)
+    if (this.songs) {
       return this.songs[this.activeIndex];
-    else return null;
+    } else {
+      return null;
+    }
   }
 
-  private _keydown(event: any){
-    switch(event.keyCode){
+  @HostListener('document:keydown', ['$event'])
+  private _keydown(event: any) {
+    switch (event.keyCode) {
       case 13: // Enter
         this._keyEnter();
         break;
@@ -92,18 +91,18 @@ export class SongWheel {
     }
   }
 
-  private _keyEnter(){
+  private _keyEnter() {
     let target = this.songs[this.activeIndex];
-    if(target.id){
+    if (target.id) {
       this._router.navigate(['Play', {id: target.id}]);
     }
   }
 
-  private _keyDownArrow(){
+  private _keyDownArrow() {
     this.select(++this.activeIndex % this.songs.length);
   }
 
-  private _keyUpArrow(){
+  private _keyUpArrow() {
     this.select(--this.activeIndex < 0 ? this.songs.length + this.activeIndex : this.activeIndex);
   }
 }

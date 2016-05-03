@@ -1,28 +1,24 @@
 import {Injectable} from 'angular2/core';
-import {Song} from '../../shared/interfaces/song';
-import {SONGS} from '../song-provider/mock-songs';
 
 @Injectable()
 export class DatabaseService {
   private _utils: Utils;
-  private _db: any;
-  private _request: any;
   private _wrapper: DBWrapper;
 
   constructor() {
     this._utils = new Utils();
-    this._wrapper = new DBWrapper("rhythmos", 1);
+    this._wrapper = new DBWrapper('rhythmos', 1);
   }
 
   public deleteDB() {
     let promise = new Promise<any>((resolve, reject) => {
       let request = this._utils.indexedDB.deleteDatabase('rhythmos');
       request.onsuccess = (e) => {
-        console.log("deleted DB");
+        console.log('deleted DB');
         resolve();
       };
       request.onerror = (e) => {
-        reject("error deleting database");
+        reject('error deleting database');
       };
     });
     return promise;
@@ -66,7 +62,7 @@ export class DatabaseService {
       request = objectStore.get(key);
       request.onsuccess = (event) => {
         result = event.target.result;
-      }
+      };
     });
     return promise;
   }
@@ -94,14 +90,14 @@ export class DatabaseService {
         var cursor = (<IDBOpenDBRequest>event.target).result;
         if (cursor) {
           result.push(cursor.value);
-          cursor["continue"]();
+          cursor['continue']();
         }
       };
     });
     return promise;
   }
 
-  public add(store: string, value: any, key?: any): Promise<any>{
+  public add(store: string, value: any, key?: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let request;
@@ -117,12 +113,14 @@ export class DatabaseService {
         }),
         objectStore = transaction.objectStore(store);
       request = key ? objectStore.add(value, key) : objectStore.add(value);
-      request.onsuccess = (event) => {key = event.target.result};
+      request.onsuccess = (event) => {
+        key = event.target.result;
+      };
     });
     return promise;
   }
 
-  public update(store: string, value: any, key: any): Promise<any>{
+  public update(store: string, value: any, key: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let transaction = this._wrapper.createTransaction({
@@ -140,11 +138,11 @@ export class DatabaseService {
         }),
         objectStore = transaction.objectStore(store);
       objectStore.put(value, key);
-    })
+    });
     return promise;
   }
 
-  public delete(store: string, key: any): Promise<any>{
+  public delete(store: string, key: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let transaction = this._wrapper.createTransaction({
@@ -161,12 +159,12 @@ export class DatabaseService {
           }
         }),
         objectStore = transaction.objectStore(store);
-      objectStore["delete"](key);
-    })
+      objectStore['delete'](key);
+    });
     return promise;
   }
 
-  public openCursor(store: string, cursorCallback: (event) => void): Promise<any>{
+  public openCursor(store: string, cursorCallback: (event) => void): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let transaction = this._wrapper.createTransaction({
@@ -188,11 +186,11 @@ export class DatabaseService {
         cursorCallback(event);
         resolve();
       };
-    })
+    });
     return promise;
   }
 
-  public clear(store: string, indexName: string, key: any): Promise<any>{
+  public clear(store: string, indexName: string, key: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let transaction = this._wrapper.createTransaction({
@@ -211,11 +209,11 @@ export class DatabaseService {
         objectStore = transaction.objectStore(store);
       objectStore.clear();
       resolve();
-    })
+    });
     return promise;
   }
 
-  public getByIndex(store: string, indexName: string, key: any): Promise<any>{
+  public getByIndex(store: string, indexName: string, key: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._wrapper.validateBeforeTransaction(store, reject);
       let transaction = this._wrapper.createTransaction({
@@ -250,8 +248,8 @@ class Utils {
   constructor() {
     this.indexedDB = window.indexedDB;
       this.dbMode = {
-        readOnly: "readonly",
-        readWrite: "readwrite"
+        readOnly: 'readonly',
+        readWrite: 'readwrite'
       };
   }
 }
@@ -285,8 +283,7 @@ class DBWrapper {
                              store: string, mode: string,
                              error: (e: Event) => any,
                              complete: (e: Event) => any,
-                             abort?: (e: Event) => any})
-                           : IDBTransaction {
+                             abort?: (e: Event) => any}): IDBTransaction {
     let txn: IDBTransaction = this.db.transaction(options.store, options.mode);
     txn.onerror = options.error;
     txn.oncomplete = options.complete;

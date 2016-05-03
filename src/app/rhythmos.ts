@@ -23,10 +23,4 @@ import {OptionsRoot} from './options/options-root.component';
   {path:'/song-wheel/...', name: 'SongWheel', component: SongWheelRoot},
   {path:'/options/...', name: 'Options', component: OptionsRoot}
 ])
-export class RhythmosApp {
-  defaultMeaning: number = 42;
-
-  meaningOfLife(meaning?: number) {
-    return `The meaning of life is ${meaning || this.defaultMeaning}`;
-  }
-}
+export class RhythmosApp {}

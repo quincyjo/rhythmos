@@ -1,4 +1,4 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, HostListener} from 'angular2/core';
 import {Router} from 'angular2/router';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
@@ -10,48 +10,42 @@ import {ROUTER_DIRECTIVES} from 'angular2/router';
   providers: [],
   directives: [ROUTER_DIRECTIVES],
   pipes: [],
-  host: {
-    '(document:keyup)': '_keyup($event)'
-  }
 })
 export class MainMenu {
   private _activeIndex: number;
   public menu = [
     {
-      name: "Play",
-      path: ['SongWheel'],
-      active: false
+      name: 'Play',
+      path: ['SongWheel']
     },
     {
-      name: "Options",
-      path: ['Options'],
-      active: false
+      name: 'Options',
+      path: ['Options']
     },
     {
-      name: "Github Page",
+      name: 'Github Page',
       path: null,
-      href: "http://www.github.com/verbetam/rhythmos",
-      active: false
+      href: 'http://www.github.com/verbetam/rhythmos'
     }
   ];
 
   constructor(private _router: Router) {}
 
   ngOnInit() {
-    this.menu[0].active = true;
-    this._activeIndex = 0;
+    this.select(0);
   }
 
-  public select(index: number){
+  public select(index: number) {
     this._activeIndex = index;
   }
 
-  public isSelected(index: number){
+  public isSelected(index: number) {
     return this._activeIndex === index;
   }
 
-  private _keyup(event: any){
-    switch(event.keyCode){
+  @HostListener('document:keydown', ['$event'])
+  private _keydown(event: any) {
+    switch (event.keyCode) {
       case 13: // Enter
         this._keyEnter();
         break;
@@ -64,18 +58,20 @@ export class MainMenu {
     }
   }
 
-  private _keyEnter(){
+  private _keyEnter() {
     let target = this.menu[this._activeIndex];
-    if(target.path){
+    if (target.path) {
       this._router.navigate(target.path);
     }
   }
 
-  private _keyDownArrow(){
+  private _keyDownArrow() {
     this._activeIndex = (++this._activeIndex % this.menu.length);
   }
 
-  private _keyUpArrow(){
-    this._activeIndex = --this._activeIndex < 0 ? this.menu.length + this._activeIndex : this._activeIndex;
+  private _keyUpArrow() {
+    this._activeIndex = --this._activeIndex < 0
+                      ? this.menu.length + this._activeIndex
+                      : this._activeIndex;
   }
 }

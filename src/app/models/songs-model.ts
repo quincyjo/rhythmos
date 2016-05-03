@@ -24,7 +24,7 @@ export class SongsModel {
    * Fetchs all songs and returns them. Does not resolve references.
    * @return {Promise<any>} Resolves to the array of songs.
    */
-  public getSongs(): Promise<any>{
+  public getSongs(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._fetchSongs().then(() => {
         resolve(this._songs);
@@ -39,7 +39,7 @@ export class SongsModel {
    * @return {Promise<any>}     Resolves to the requested song. Logs error on failure. Does not
    *                            reject.
    */
-  public getSongByKey(key: any): Promise<any>{
+  public getSongByKey(key: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       // Check cached songs
       let local = this._songs.find(
@@ -60,7 +60,7 @@ export class SongsModel {
           });
         });
       }
-    })
+    });
     return promise;
   }
 
@@ -104,7 +104,7 @@ export class SongsModel {
    * @param  {any}          song Song to be stored.
    * @return {Promise<any>}      Resolves on success, logs error on failure. Does not reject.
    */
-  public addSong(song: any): Promise<any>{
+  public addSong(song: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       // Resolve and detatch blobs from song
       this._fetchBlobs(song).then((blobs) => {
@@ -113,13 +113,15 @@ export class SongsModel {
           // Add all resolved blobs to blob objectStore
           let promises: Promise<any>[] = [];
           for (let blob of blobs) {
-            if (blob) promises.push(this._addBlob(blob.value, keypair.key, blob.key));
+            if (blob) {
+              promises.push(this._addBlob(blob.value, keypair.key, blob.key));
+            }
           }
           Promise.all(promises).then((values) => {
             resolve();
           }, (error) => {
             console.log(error);
-          })
+          });
         }, (error) => {
           console.log(error);
         });
@@ -138,11 +140,13 @@ export class SongsModel {
    *                             blob stored in the blob attribute. Logs error on filure. Does not
    *                             reject.
    */
-  private _getBlob(key: any, name: any): Promise<any>{
+  private _getBlob(key: any, name: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       // Check cached songs
       let local = this._blobs.find(
-        (blob) => { return (blob.id === key && blob.name === name)}
+        (blob) => {
+          return (blob.id === key && blob.name === name);
+        }
       );
       if (local) { resolve(local); }
       // Not stored, query DB
@@ -150,8 +154,8 @@ export class SongsModel {
         this._blobs.push(blob);
         resolve(blob);
       }, (error) => {
-        console.log("Failed to fetch blob: ", error);
-      })
+        console.log('Failed to fetch blob: ', error);
+      });
     });
     return promise;
   }
@@ -174,7 +178,7 @@ export class SongsModel {
         resolve(keypair);
       }, (error) => {
         console.log(error);
-      })
+      });
     });
     return promise;
   }
@@ -183,34 +187,34 @@ export class SongsModel {
    * Initializes the object stores, creating them if needed. Fills them with base data if created.
    * @return {Promise<any>} Resolves once initiation is complete, reject if database error occured.
    */
-  private _init(): Promise<any>{
+  private _init(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
     this._database.deleteDB().then(() => {
       let fill: boolean = false;
       this._database.createStore(1, (event) => { // Create objectStore
-        console.log("Creating songs");
+        console.log('Creating songs');
         let objectStore = event.currentTarget.result.createObjectStore(
           'songs', {keyPath: 'id', autoIncrement: true});
-        objectStore.createIndex("title", "title", {unique: false});
-        objectStore.createIndex("subtitle", "subtitle", {unique: false});
-        objectStore.createIndex("artist", "artist", {unique: false});
-        objectStore.createIndex("genre", "genre", {unique: false});
-        objectStore.createIndex("credit", "credit", {unique: false});
-        objectStore.createIndex("banner", "banner", {unique: false});
-        objectStore.createIndex("background", "background", {unique: false});
-        objectStore.createIndex("cdtitle", "cdtitle", {unique: false});
-        objectStore.createIndex("music", "music", {unique: false});
-        objectStore.createIndex("offset", "offset", {unique: false});
-        objectStore.createIndex("bpms", "bpms", {unique: false});
-        objectStore.createIndex("stops", "stops", {unique: false});
-        objectStore.createIndex("samplestart", "samplestart", {unique: false});
-        objectStore.createIndex("samplelength", "samplelength", {unique: false});
-        objectStore.createIndex("displaybpm", "displaybpm", {unique: false});
-        objectStore.createIndex("selectable", "selectable", {unique: false});
-        objectStore.createIndex("notes", "notes", {unique: false});
+        objectStore.createIndex('title', 'title', {unique: false});
+        objectStore.createIndex('subtitle', 'subtitle', {unique: false});
+        objectStore.createIndex('artist', 'artist', {unique: false});
+        objectStore.createIndex('genre', 'genre', {unique: false});
+        objectStore.createIndex('credit', 'credit', {unique: false});
+        objectStore.createIndex('banner', 'banner', {unique: false});
+        objectStore.createIndex('background', 'background', {unique: false});
+        objectStore.createIndex('cdtitle', 'cdtitle', {unique: false});
+        objectStore.createIndex('music', 'music', {unique: false});
+        objectStore.createIndex('offset', 'offset', {unique: false});
+        objectStore.createIndex('bpms', 'bpms', {unique: false});
+        objectStore.createIndex('stops', 'stops', {unique: false});
+        objectStore.createIndex('samplestart', 'samplestart', {unique: false});
+        objectStore.createIndex('samplelength', 'samplelength', {unique: false});
+        objectStore.createIndex('displaybpm', 'displaybpm', {unique: false});
+        objectStore.createIndex('selectable', 'selectable', {unique: false});
+        objectStore.createIndex('notes', 'notes', {unique: false});
         let blobStore = event.currentTarget.result.createObjectStore(
-          'songBlobs', {keyPath: ['id','name']});
-        blobStore.createIndex("blob", "blob", {unique: false});
+          'songBlobs', {keyPath: ['id', 'name']});
+        blobStore.createIndex('blob', 'blob', {unique: false});
         fill = true;
       }).then( () => { // Resolve
         if (fill) { // If initiated, fill with moch data
@@ -228,7 +232,7 @@ export class SongsModel {
     return promise;
   }
 
-  private _fillMockData(): Promise<any>{
+  private _fillMockData(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       let promises: Promise<any>[] = [];
       for (let song of SONGS) {
@@ -253,9 +257,9 @@ export class SongsModel {
    *                             void if no blob, and reject if invalid
    *                             attribute. Logs error on XHR failure.
    */
-  private _fetchBlob(song: any, name: string): Promise<any>{
+  private _fetchBlob(song: any, name: string): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      if(song[name]) {
+      if (song[name]) {
         this.getBlobFromUrl(song[name]).then((blob) => {
           let path = song[name];
           song[name] = true;
@@ -282,7 +286,7 @@ export class SongsModel {
    * @return {Promise<any>}      Resolved to array of blobs or logs error on
    *                             failure.
    */
-  private _fetchBlobs(song: any): Promise<any>{
+  private _fetchBlobs(song: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       let promises: Promise<any>[] = [];
       let names = ['banner', 'background', 'music'];
@@ -298,7 +302,7 @@ export class SongsModel {
     return promise;
   }
 
-  private _fetchSongs(): Promise<any>{
+  private _fetchSongs(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._database.getAll('songs').then(
         (songs) => {
@@ -321,13 +325,13 @@ export class SongsModel {
       let img = new Image();
       img.setAttribute('crossOrigin', 'anonymous');
       img.onload = () => {
-        let canvas = document.createElement("canvas");
+        let canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        let ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
-        let dataURL = canvas.toDataURL("image/png");
-        //dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+        let dataURL = canvas.toDataURL('image/png');
+        // dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
         resolve(dataURL);
       };
       img.src = url;
@@ -344,14 +348,14 @@ export class SongsModel {
     let promise = new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest(),
           blob: any;
-      xhr.open("GET", url, true);
+      xhr.open('GET', url, true);
       xhr.responseType = 'blob';
       xhr.addEventListener('load', () => {
         if (xhr.status === 200) {
           blob = xhr.response;
           resolve(blob);
         } else {
-          reject("XMLHttpRequest filed with code: " + xhr.status)
+          reject('XMLHttpRequest filed with code: ' + xhr.status);
         }
       }, false);
       xhr.send();

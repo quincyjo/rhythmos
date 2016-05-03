@@ -1,4 +1,4 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, HostListener, Input} from 'angular2/core';
 import {Router, RouteParams} from 'angular2/router';
 import {Song} from '../../shared/interfaces/song';
 import {SongProvider} from '../../services/song-provider/song-provider';
@@ -19,19 +19,14 @@ let measureOffset: number;
 
 @Component({
   selector: 'song-chart',
-  inputs: ['song'],
   templateUrl: 'app/components/song-chart/song-chart.html',
   styleUrls: ['app/components/song-chart/song-chart.html'],
   providers: [SongProvider],
   directives: [],
-  pipes: [],
-  host: {
-    '(document:keydown)': '_keydown($event)',
-    '(document:keyup)': '_keyup($event)'
-  }
+  pipes: []
 })
 export class SongChart {
-    public song: Song;
+    @Input() song: Song;
     private _canvas: HTMLCanvasElement;
     private _keys: number[];
     private _tracks: Track[];
@@ -83,18 +78,20 @@ export class SongChart {
 
   private _fadeIn(length: number) {
     let promise = new Promise<any>((resolve, reject) => {
-      let start = Date.now();
-      let fin = start + length;
+      let fadeStart = Date.now();
+      let fin = fadeStart + length;
       let run = () => {
         if (Date.now() < fin) {
           requestAnimationFrame(() => {
-            this._fadeStep(1 - (Date.now() - start) / length);
+            this._fadeStep(1 - (Date.now() - fadeStart) / length);
             run();
-          })
-        } else resolve();
-      }
+          });
+        } else {
+          resolve();
+        }
+      };
       run();
-    })
+    });
     return promise;
   }
 
@@ -108,11 +105,12 @@ export class SongChart {
   }
 
   private _run() {
-    if (this._continue)
+    if (this._continue) {
       requestAnimationFrame(() => {
         this._tick();
         this._run();
       });
+    }
   }
 
   private _tick() {
@@ -126,20 +124,21 @@ export class SongChart {
 
   private _render() {
     this._drawBg();
-    for (let track of this._tracks)
+    for (let track of this._tracks) {
       track.draw();
+    }
     scoreBoard.drawSplash(this._canvas);
   }
 
   private _update(modifier: number) {
     this._updateMeasure();
-    for (let index in this._tracks){
+    for (let index in this._tracks) {
       this._tracks[index].update(this._keys[index], modifier);
     }
   }
 
-  private _prerenderMeasures(){
-    for(let i = 0; i < measureOffset; i++) {
+  private _prerenderMeasures() {
+    for (let i = 0; i < measureOffset; i++) {
       this._loadMeasure(i);
     }
   }
@@ -157,7 +156,7 @@ export class SongChart {
       for (let i = 0; i < measure.length; i++) {
         let line = measure[i];
         for (let j = 0; j < line.length; j++) {
-          if (line[j] == 1 || line[j] == 2){
+          if (line[j] == 1 || line[j] == 2) {
             this._tracks[j].steps.push(
               factory.createStep(i, measure.length)
             );
@@ -166,8 +165,9 @@ export class SongChart {
       }
   }
 
-  private _keydown(event: any){
-    switch(event.keyCode){
+  @HostListener('document:keydown', ['$event'])
+  private _keydown(event: any) {
+    switch (event.keyCode) {
       case 37: // Left Arrow
       case 68:
         this._pressKey(0);
@@ -187,8 +187,9 @@ export class SongChart {
     }
   }
 
-  private _keyup(event: any){
-    switch(event.keyCode){
+  @HostListener('document:keyup', ['$event'])
+  private _keyup(event: any) {
+    switch (event.keyCode) {
       case 37: // Left Arrow
       case 68:
         this._releaseKey(0);
@@ -209,7 +210,7 @@ export class SongChart {
   }
 
   private _pressKey(index: number) {
-    if(this._keys[index] == 0) {
+    if (this._keys[index] == 0) {
       this._keys[index] = Date.now();
     }
   }
@@ -225,28 +226,28 @@ export class SongChart {
         arrow = new Image;
         arrow.onload = () => {
           resolve();
-        }
+        };
         arrow.src = 'app/images/arrow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         receptor = new Image;
         receptor.onload = () => {
           resolve();
-        }
+        };
         receptor.src = 'app/images/receptor.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         flash = new Image;
         flash.onload = () => {
           resolve();
-        }
+        };
         flash.src = 'app/images/flash.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         glow = new Image;
         glow.onload = () => {
           resolve();
-        }
+        };
         glow.src = 'app/images/glow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
@@ -257,7 +258,7 @@ export class SongChart {
           bg = new Image;
           bg.onload = () => {
             resolve();
-          }
+          };
           if (this.song.background === true) {
             this._songProvider.getBackground(this.song).then((background) => {
               bg.src = background;
@@ -294,10 +295,14 @@ export class SongChart {
   private _buildTracks() {
     let promise = new Promise<any>((resolve, reject) => {
       this._tracks = [
-        new Track(0.5 * Math.PI , this._canvas.getContext('2d'), 32),
-        new Track(0, this._canvas.getContext('2d'), 32+128+16),
-        new Track(1.0 * Math.PI , this._canvas.getContext('2d'), 32+128+16+128+16),
-        new Track(1.5 * Math.PI , this._canvas.getContext('2d'), 32+128+16+128+16+128+16)
+        new Track(0.5 * Math.PI , this._canvas.getContext('2d'),
+                  32),
+        new Track(0, this._canvas.getContext('2d'),
+                  32 + 128 + 16),
+        new Track(1.0 * Math.PI , this._canvas.getContext('2d'),
+                  32 + 128 + 16 + 128 + 16),
+        new Track(1.5 * Math.PI , this._canvas.getContext('2d'),
+                  32 + 128 + 16 + 128 + 16 + 128 + 16)
       ];
       resolve();
     });
@@ -312,7 +317,7 @@ export class SongChart {
   }
 }
 
-class Track{
+class Track {
   private _img;
   private _flash;
   private _glow;
@@ -328,13 +333,13 @@ class Track{
   }
 
   public update(keystate: number, modifier: number) {
-    if(keystate) {
-      if(!this._held){
+    if (keystate) {
+      if (!this._held) {
         this._held = true;
         this._checkStep(keystate);
       }
       this._delta = Date.now() - keystate;
-      if(this._delta < 100){
+      if (this._delta < 100) {
         this._flash = true;
       } else {
         this._flash = false;
@@ -349,14 +354,14 @@ class Track{
     this.cxt.save();
     this.cxt.translate(64 + this.offset, 64 + 32);
     this.cxt.rotate(this.rotation);
-    this.cxt.drawImage(this._img, -(this._img.width/2), -(this._img.height/2));
-    if(this._held) {
+    this.cxt.drawImage(this._img, -(this._img.width / 2), -(this._img.height / 2));
+    if (this._held) {
       this.cxt.globalAlpha = this._delta / 50;
-      this.cxt.drawImage(glow, -(glow.width/2), -(glow.height/2));
+      this.cxt.drawImage(glow, -(glow.width / 2), -(glow.height / 2));
     }
-    if(this._flash){
+    if (this._flash) {
       this.cxt.globalAlpha = 1 - this._delta / 100;
-      this.cxt.drawImage(flash, -(flash.width/2), -(flash.height/2));
+      this.cxt.drawImage(flash, -(flash.width / 2), -(flash.height / 2));
     }
     this.cxt.globalAlpha = 1;
     this.cxt.restore();
@@ -364,9 +369,9 @@ class Track{
   }
 
   private _checkStep(hit: number) {
-    if (this.steps[0]){
+    if (this.steps[0]) {
       let step = this.steps[0];
-      if (step.target - hit < 180){
+      if (step.target - hit < 180) {
         scoreBoard.score(step.target, hit);
         this.steps.splice(0, 1);
       }
@@ -377,21 +382,21 @@ class Track{
     let step: Step;
     for (let i = 0; i < this.steps.length; i++) {
       step = this.steps[i];
-      if (step.target - Date.now() < -200){
+      if (step.target - Date.now() < -200) {
         this.steps.splice(i, 1);
         scoreBoard.miss();
       } else {
         this.cxt.save();
         this.cxt.translate(64 + this.offset, 64 + 32 + (step.target - Date.now()));
         this.cxt.rotate(this.rotation);
-        this.cxt.drawImage(arrow, step.sx, step.sy, step.swidth, step.sheight, -64, -64, 128, 128)
+        this.cxt.drawImage(arrow, step.sx, step.sy, step.swidth, step.sheight, -64, -64, 128, 128);
         this.cxt.restore();
       }
     }
   }
 }
 
-interface Step{
+interface Step {
   sx: number;
   sy: number;
   swidth: number;
@@ -404,41 +409,62 @@ interface Step{
   time: number;
 }
 
-class StepFactory{
+class StepFactory {
   constructor() {}
 
   public createStep(beat: number, time: number): Step {
     let offset: number;
-    switch(time) {
+    switch (time) {
         case 3:
-          if (beat == 0) offset = 0
-          else offset = 256;
+          if (beat == 0) {
+            offset = 0;
+          } else {
+            offset = 256;
+          }
           break;
         case 4:
           offset = 0;
           break;
         case 6:
-          if (beat == 0 || beat == 3) offset = 0;
-          else offset = 256;
+          if (beat == 0 || beat == 3) {
+            offset = 0;
+          } else {
+            offset = 256;
+          }
           break;
         case 8:
-          if ((beat & 1) == 0) offset = 0;
-          else offset = 128;
+          if ((beat & 1) == 0) {
+            offset = 0;
+          } else {
+            offset = 128;
+          }
           break;
         case 9:
-          if (beat == 0 || beat == 3 || beat == 6) offset = 0;
-          else offset = 256;
+          if (beat == 0 || beat == 3 || beat == 6) {
+            offset = 0;
+          } else {
+            offset = 256;
+          }
           break;
         case 16:
-          if((beat & 3) == 0) offset = 0;
-          else if ((beat & 1) == 0) offset = 128;
-          else offset = 384;
+          if ((beat & 3) == 0) {
+            offset = 0;
+          } else if ((beat & 1) == 0) {
+            offset = 128;
+          } else {
+            offset = 384;
+          }
           break;
         case 32:
-          if ((beat & 7) == 0) offset = 0;
-          else if ((beat & 3) == 0) offset = 128;
-          else if ((beat & 1) == 0) offset = 384;
-          else offset = 640;
+          if ((beat & 7) == 0) {
+            offset = 0;
+          } else if ((beat & 3) == 0) {
+            offset = 128;
+          } else if ((beat & 1) == 0) {
+            offset = 384;
+          } else {
+            offset = 640;
+          }
           break;
         default:
           offset = 896;
@@ -450,7 +476,7 @@ class StepFactory{
       sheight: 128,
       x: 0,
       y: 0,
-      target: start + (lastMeasureIndex + (beat/time)) * measureStep,
+      target: start + (lastMeasureIndex + (beat / time)) * measureStep,
       measure: lastMeasureIndex,
       beat: beat,
       time: time,
@@ -458,7 +484,7 @@ class StepFactory{
   }
 }
 
-class ScoreBoard{
+class ScoreBoard {
   private _life: number;
   private _score: number;
   private _combo: number;
@@ -476,7 +502,7 @@ class ScoreBoard{
     this._great = this._good = this._bad = this._boo = this._poor = 0;
   }
 
-  public score(target: number, hit: number){
+  public score(target: number, hit: number) {
     let delta = target - hit;
     delta = Math.abs(delta);
     if (delta < 22.5) { // Flawless
@@ -536,10 +562,10 @@ class ScoreBoard{
   }
 
   public drawSplash(canvas: HTMLCanvasElement) {
-    if (this._lastScore){
+    if (this._lastScore) {
       this._drawLast(canvas);
     }
-    if (this._combo){
+    if (this._combo) {
       this._drawCombo(canvas);
     }
   }
@@ -548,14 +574,14 @@ class ScoreBoard{
       let mid = canvas.height / 2 - 40;
       let cxt = canvas.getContext('2d');
       cxt.save();
-      cxt.font = "50px Helvetica";
-      cxt.textAlign = "center";
-      cxt.fillStyle = "#000";
+      cxt.font = '50px Helvetica';
+      cxt.textAlign = 'center';
+      cxt.fillStyle = '#000';
       cxt.strokeText(this._lastScore, 350, mid);
-      cxt.fillStyle = "#000";
-      let grad= cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
-      grad.addColorStop(0,"white");
-      grad.addColorStop(1,"black");
+      cxt.fillStyle = '#000';
+      let grad = cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
+      grad.addColorStop(0, 'white');
+      grad.addColorStop(1, 'black');
       cxt.fillStyle = grad;
       cxt.fillText(this._lastScore, 350, mid);
       cxt.restore();
@@ -565,16 +591,16 @@ class ScoreBoard{
       let mid = canvas.height / 2;
       let cxt = canvas.getContext('2d');
       cxt.save();
-      cxt.font = "40px Helvetica";
-      cxt.textAlign = "center";
-      cxt.fillStyle = "#000";
-      cxt.strokeText("Combo " + this._combo, 350, mid);
-      cxt.fillStyle = "#000";
-      let grad= cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
-      grad.addColorStop(0,"white");
-      grad.addColorStop(1,"black");
+      cxt.font = '40px Helvetica';
+      cxt.textAlign = 'center';
+      cxt.fillStyle = '#000';
+      cxt.strokeText('Combo ' + this._combo, 350, mid);
+      cxt.fillStyle = '#000';
+      let grad = cxt.createLinearGradient(0, mid - 20, 0, mid + 20);
+      grad.addColorStop(0, 'white');
+      grad.addColorStop(1, 'black');
       cxt.fillStyle = grad;
-      cxt.fillText("Combo " + this._combo, 350, mid);
+      cxt.fillText('Combo ' + this._combo, 350, mid);
       cxt.restore();
   }
 }

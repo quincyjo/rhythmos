@@ -3,15 +3,15 @@
   margin: 0;
 }
 
-.main-menu{
+.main-menu {
   height: 100%;
   width: 100%;
 }
 
-.main-menu-content{
-  width:100%;
-  position:absolute;
-  bottom:25%;
+.main-menu-content {
+  width: 100%;
+  position: absolute;
+  bottom: 25%;
 }
 
 h1 {
