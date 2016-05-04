@@ -36,6 +36,7 @@
     "./app/options/options-list.component.spec.ts",
     "./app/options/options-list.component.ts",
     "./app/options/options-root.component.ts",
+    "./app/pipes/sort-objects-by.ts",
     "./app/rhythmos.spec.ts",
     "./app/rhythmos.ts",
     "./app/services/database-service/database-service.spec.ts",
