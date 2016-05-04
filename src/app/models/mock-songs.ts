@@ -31,8 +31,8 @@ export var SONGS = [
     offset: 0,
     bpms: [210],
     stops: [],
-    samplestart: 0,
-    samplelength: 0,
+    samplestart: 45.714001,
+    samplelength: 13.714,
     displaybpm: "210",
     selectable: true,
     notes: {

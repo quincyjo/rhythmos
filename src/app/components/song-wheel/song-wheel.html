@@ -7,7 +7,7 @@
     <div class="background"
       *ngFor="#bg of bgs; #i = index;"
       [ngClass]="{
-        'fade-in': i == bgs.length - 1
+        'fade-in': i == bgs.length - 1 && i != 0
       }"
       [ngStyle]="{
         'background': bg
@@ -21,8 +21,7 @@
           *ngFor="#song of songs; #i = index;"
           (mouseenter)="select(i)"
           [ngClass]="{'selected': isSelected(i)}"
-          [routerLink]="['Play', {'id': song.id}]"
-          (click)="onSelect(song)">
+          [routerLink]="['Play', {'id': song.id}]">
           <h2 class="song-title">{{song.title}}</h2>
           <h3 class="song-subtitle">{{song.subtitle}}</h3>
           <h4 class="song-artist">~{{song.artist}}</h4>
