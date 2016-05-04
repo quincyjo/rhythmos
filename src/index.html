@@ -7,6 +7,7 @@
   {{content-for 'head'}}
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="stylesheet" type="text/css" href="css/loading.css">
 
   <!-- Service worker support is disabled by default.
        Install the worker script and uncomment to enable.
@@ -21,7 +22,9 @@
   -->
 </head>
 <body>
-  <rhythmos-app>Loading...</rhythmos-app>
+  <rhythmos-app>
+    <div class="loading">loading</div>
+  </rhythmos-app>
 
   <script src="vendor/es6-shim/es6-shim.js"></script>
   <script src="vendor/systemjs/dist/system-polyfills.js"></script>
