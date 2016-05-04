@@ -16,11 +16,13 @@ export class MainMenu {
   public menu = [
     {
       name: 'Play',
-      path: ['SongWheel']
+      path: ['SongWheel'],
+      href: null
     },
     {
       name: 'Options',
-      path: ['Options']
+      path: ['Options'],
+      href: null
     },
     {
       name: 'Github Page',
@@ -62,6 +64,8 @@ export class MainMenu {
     let target = this.menu[this._activeIndex];
     if (target.path) {
       this._router.navigate(target.path);
+    } else if (target.href) {
+      window.open(target.href, '_blank');
     }
   }
 
