@@ -12,12 +12,12 @@ import {SONGS} from './mock-songs';
 export class SongsModel {
   private _songs: Array<Song>;
   private _blobs: Array<any>;
-  private _dataUrls: Array<any>;
+  private _objectUrls: Array<any>;
 
   constructor(private _database: DatabaseService) {
     this._songs = [];
     this._blobs = [];
-    this._dataUrls = [];
+    this._objectUrls = [];
   }
 
   /**
@@ -65,16 +65,16 @@ export class SongsModel {
   }
 
   /**
-   * Returns a valid data URL to the request attribut of the song referenced by key. If one does
-   * not already exists, it is created. Live song is then updated with valid data url.
+   * Returns a valid object URL to the request attribut of the song referenced by key. If one does
+   * not already exists, it is created. Live song is then updated with valid object url.
    * @param  {any}          key  ID of the song reference.
    * @param  {any}          name Attribute name of the song
-   * @return {Promise<any>}      Resolves to the data url. Log error on failure. Does not reject.
+   * @return {Promise<any>}      Resolves to the object url. Log error on failure. Does not reject.
    */
-  public getDataUrl(key: any, name: any): Promise<any> {
+  public getObjectUrl(key: any, name: any): Promise<any> {
     let promise = new Promise((resolve, reject) => {
-      // Check cached dataUrls
-      let local = this._dataUrls.find( (url) => {
+      // Check cached object urls
+      let local = this._objectUrls.find( (url) => {
         return (url.id === key && url.name === name);
       });
       if (local) {
@@ -86,7 +86,7 @@ export class SongsModel {
         let URL = window.URL;
         let dataUrl = URL.createObjectURL(blob.blob);
         // Store to be retired
-        this._dataUrls.push(dataUrl);
+        this._objectUrls.push(dataUrl);
         this.getSongByKey(key).then((song) => {
           song[name] = dataUrl;
         });

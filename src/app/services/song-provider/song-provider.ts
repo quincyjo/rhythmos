@@ -28,7 +28,7 @@ export class SongProvider {
 
   public getBanner(song: Song): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      this._model.getDataUrl(song.id, 'banner').then(
+      this._model.getObjectUrl(song.id, 'banner').then(
       (banner) => {
         resolve(banner);
       }, (error) => {
@@ -40,7 +40,7 @@ export class SongProvider {
 
   public getBackground(song: Song): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      this._model.getDataUrl(song.id, 'background').then(
+      this._model.getObjectUrl(song.id, 'background').then(
       (background) => {
         resolve(background);
       }, (error) => {
@@ -52,7 +52,7 @@ export class SongProvider {
 
   public getMusic(song: Song): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      this._model.getDataUrl(song.id, 'music').then(
+      this._model.getObjectUrl(song.id, 'music').then(
       (music) => {
         resolve(music);
       }, (error) => {
