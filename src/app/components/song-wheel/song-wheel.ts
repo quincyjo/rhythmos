@@ -18,9 +18,12 @@ export class SongWheel {
   public selectedSong: Song;
   public activeIndex: number;
   public bg: any;
+  public bgs: Array<any>;
 
   constructor(private _songProvider: SongProvider,
-              private _router: Router) {}
+              private _router: Router) {
+                this.bgs = [];
+              }
 
   getSongs() {
     this._songProvider.getSongs().then(songs => {
@@ -45,23 +48,33 @@ export class SongWheel {
   }
 
   public fetchBackground() {
+    let bg: any;
     if (this.songs
     && this.songs[this.activeIndex]) {
       let song = this.songs[this.activeIndex];
       if (song.background === true) {
         this._songProvider.getBackground(song).then((background) => {
-          this.bg = `
+          bg = `
             radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
             url("` + song.background + '") 50% 50% / cover no-repeat';
+          if (this.bgs.length > 5) {
+            this.bgs.splice(0, 1);
+          }
+          this.bgs.push(bg);
         });
       } else {
-        this.bg = `
+        bg = `
           radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
             url("` + song.background + '") 50% 50% / cover no-repeat';
+          if (this.bgs.length > 5) {
+            this.bgs.splice(0, 1);
+          }
+          this.bgs.push(bg);
       }
     } else {
-      this.bg = '#000';
+      bg = '#000';
     }
+    this.bg = bg;
   }
 
   public isSelected(index: number): boolean {

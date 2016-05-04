@@ -32,7 +32,7 @@
 }
 
 .background {
-  transition: linear 1s;
+  transition: linear 0.25s;
   position: absolute;
   top: 0;
   left: 0;
@@ -40,7 +40,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  -webkit-filter: blur(5px);
+  -webkit-filter: blur(3px);
+  filter: blur(3px);
 }
 
 .content {
@@ -129,4 +130,18 @@ h4.song-artist {
   position: absolute;
   right: 5px;
   bottom: 3px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    width:105%;
+  } to {
+    opacity: 1;
+    width: 100%;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.4s ease-out;
 }

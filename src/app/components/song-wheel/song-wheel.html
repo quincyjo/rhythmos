@@ -5,9 +5,13 @@
   </div>
   <div class="content">
     <div class="background"
-    [ngStyle]="{
-      'background': bg
-    }"></div>
+      *ngFor="#bg of bgs; #i = index;"
+      [ngClass]="{
+        'fade-in': i == bgs.length - 1
+      }"
+      [ngStyle]="{
+        'background': bg
+      }"></div>
     <div class="song-detail">
       <song-detail [song]="getSelected()"></song-detail>
     </div>
