@@ -7,9 +7,9 @@ import {
     it,
     injectAsync,
     fakeAsync,
-    TestComponentBuilder,
     tick
-} from 'angular2/testing';
+} from '@angular/core/testing';
+import {TestComponentBuilder} from '@angular/compiler/testing';
 
 import {SscReader, ChartBuilder, ValueBuilder} from './ssc-reader';
 import {Ssc, Chart} from '../../shared/interfaces';

@@ -6,12 +6,12 @@ import {
   expect,
   inject,
   injectAsync,
-  TestComponentBuilder,
   beforeEachProviders
-} from 'angular2/testing';
-import {provide} from 'angular2/core';
+} from '@angular/core/testing';
+import {TestComponentBuilder} from '@angular/compiler/testing';
+import {provide} from '@angular/core';
 import {OptionsDetailComponent} from './options-detail.component';
-import {Router, RouteParams} from 'angular2/router';
+import {Router, RouteParams} from '@angular/router-deprecated';
 import {Option} from '../shared/interfaces/option';
 import {OptionsProvider} from '../services/options-provider/options-provider';
 

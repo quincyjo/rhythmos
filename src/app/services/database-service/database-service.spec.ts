@@ -1,4 +1,4 @@
-import {describe, it, expect, inject, injectAsync, beforeEachProviders} from 'angular2/testing';
+import {describe, it, expect, inject, injectAsync, beforeEachProviders} from '@angular/core/testing';
 import {DatabaseService} from './database-service';
 import {SONGS} from '../song-provider/mock-songs';
 

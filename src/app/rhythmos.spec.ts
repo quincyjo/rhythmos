@@ -1,7 +1,7 @@
-import {describe, it, expect, beforeEachProviders, inject} from 'angular2/testing';
-import {RhythmosApp} from '../app/rhythmos';
+import {describe, it, expect, beforeEachProviders, inject} from '@angular/core/testing';
+import {RhythmosAppComponent} from './index';
 
-beforeEachProviders(() => [RhythmosApp]);
+beforeEachProviders(() => [RhythmosAppComponent]);
 
 describe('App: Rhythmos', () => {
 });

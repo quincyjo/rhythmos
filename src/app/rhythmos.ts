@@ -1,6 +1,6 @@
-// Angular2
-import {Component} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
+// @angular
+import {Component} from '@angular/core';
+import {RouteConfig, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
 // Components
 import {MainMenu} from './components/main-menu/main-menu';
@@ -23,7 +23,7 @@ import {OptionsRoot} from './options/options-root.component';
   {path:'/song-wheel/...', name: 'SongWheel', component: SongWheelRoot},
   {path:'/options/...', name: 'Options', component: OptionsRoot}
 ])
-export class RhythmosApp {
+export class RhythmosAppComponent {
 
   constructor() {}
 }

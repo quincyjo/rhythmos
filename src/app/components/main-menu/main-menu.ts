@@ -1,6 +1,6 @@
-import {Component, HostListener} from 'angular2/core';
-import {Router} from 'angular2/router';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {Component, HostListener} from '@angular/core';
+import {Router} from '@angular/router-deprecated';
+import {ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
 
 @Component({

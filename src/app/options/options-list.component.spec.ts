@@ -6,10 +6,10 @@ import {
   expect,
   inject,
   injectAsync,
-  TestComponentBuilder,
   beforeEachProviders
-} from 'angular2/testing';
-import {provide} from 'angular2/core';
+} from '@angular/core/testing';
+import {TestComponentBuilder} from '@angular/compiler/testing';
+import {provide} from '@angular/core';
 import {OptionsListComponent} from './options-list.component';
 import {Option} from '../shared/interfaces/option';
 import {OptionsProvider} from '../services/options-provider/options-provider';

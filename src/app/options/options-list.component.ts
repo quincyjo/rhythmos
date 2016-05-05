@@ -1,8 +1,8 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, OnInit} from '@angular/core';
 import {Option} from '../shared/interfaces/option';
 import {OptionsProvider} from '../services/options-provider/options-provider';
-import {RouteConfig, RouterOutlet, RouteParams, Router} from 'angular2/router';
-import {CanDeactivate, ComponentInstruction, ROUTER_DIRECTIVES} from 'angular2/router';
+import {RouteConfig, RouterOutlet, RouteParams, Router} from '@angular/router-deprecated';
+import {CanDeactivate, ComponentInstruction, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
 @Component({
   templateUrl: 'app/options/options-list.component.html',

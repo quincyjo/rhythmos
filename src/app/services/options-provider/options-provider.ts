@@ -1,4 +1,4 @@
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 import {Option} from '../../shared/interfaces/option';
 import {OptionsModel} from '../../models/options-model';
 

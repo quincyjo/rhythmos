@@ -2,7 +2,7 @@
 <h2 *ngIf="!option">Options</h2>
 
 <ul>
-  <li *ngFor="#option of options">
+  <li *ngFor="let option of options">
     <a
       [routerLink]="['OptionsList', { id: option.id }]">
       {{option.label}}

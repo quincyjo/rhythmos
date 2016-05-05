@@ -1,4 +1,4 @@
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 import {Ssc} from '../../shared/interfaces';
 import {Chart} from '../../shared/interfaces';
 import {StepsType, NoteType, STEPSCOLUMNS, DifficultyType} from '../../shared/types/index';

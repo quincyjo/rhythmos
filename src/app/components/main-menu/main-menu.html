@@ -2,7 +2,7 @@
   <div class="main-menu-content">
     <h1>Rhythmos</h1>
     <ul>
-      <li #item *ngFor="#route of menu; #i = index"
+      <li let item *ngFor="let route of menu; let i = index"
         (mouseenter)="select(i)">
         <a *ngIf="route.path"
           [ngClass]="{'selected': isSelected(i)}"

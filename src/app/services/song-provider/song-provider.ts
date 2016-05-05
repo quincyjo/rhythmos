@@ -1,4 +1,4 @@
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 import {Song} from '../../shared/interfaces/song';
 import {SongsModel} from '../../models/songs-model';
 

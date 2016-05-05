@@ -1,5 +1,5 @@
-import {Component, HostListener} from 'angular2/core';
-import {ROUTER_DIRECTIVES, Router, CanDeactivate, ComponentInstruction} from 'angular2/router';
+import {Component, HostListener} from '@angular/core';
+import {ROUTER_DIRECTIVES, Router, CanDeactivate, ComponentInstruction} from '@angular/router-deprecated';
 import {Song} from '../../shared/interfaces/song';
 import {SongDetail} from '../song-detail/song-detail';
 import {SongProvider} from '../../services/song-provider/song-provider';
