@@ -23,4 +23,7 @@ import {OptionsRoot} from './options/options-root.component';
   {path:'/song-wheel/...', name: 'SongWheel', component: SongWheelRoot},
   {path:'/options/...', name: 'Options', component: OptionsRoot}
 ])
-export class RhythmosApp {}
+export class RhythmosApp {
+
+  constructor() {}
+}
