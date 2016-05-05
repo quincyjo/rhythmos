@@ -11,28 +11,34 @@ let valueBuilder: ValueBuilder;
 @Injectable()
 export class SscReader {
 
-  constructor() {}
+  constructor() {
+    chartBuilder = new ChartBuilder();
+    valueBuilder = new ValueBuilder();
+  }
 
-  public readFromUrl(url: string): Ssc {
-    let ssc = {notedata: []};
-    this.getTextFromUrl(url).then((value) => {
-      let text = this.strip(value);
-      let split = this.split(text);
-      split.map((elem) => {
-        elem[0] = this.attributeFromTag(elem[0]);
-      })
-      for (let i = 0; i < split.length; i++) {
-        let elem = split[i];
-        let tag = elem[0];
-        let value = elem[1];
-        if (tag != 'notedata') {
-          ssc[elem[0]] = valueBuilder.buildValue(tag, value);
-        } else {
-          ssc.notedata.push(chartBuilder.buildChart(split, i));
+  public readFromUrl(url: string): Promise<Ssc> {
+    let promise = new Promise<Ssc>((resolve, reject) => {
+      let ssc = {notedata: []};
+      this.getTextFromUrl(url).then((value) => {
+        let text = this.strip(value);
+        let split = this.split(text);
+        split.map((elem) => {
+          elem[0] = this.attributeFromTag(elem[0]);
+        })
+        for (let i = 0; i < split.length; i++) {
+          let elem = split[i];
+          let tag = elem[0];
+          let value = elem[1];
+          if (tag != 'notedata') {
+            ssc[tag] = valueBuilder.buildValue(tag, value);
+          } else {
+            ssc.notedata.push(chartBuilder.buildChart(split, i));
+          }
         }
-      }
+        resolve (<Ssc>ssc);
+      });
     });
-    return <Ssc>ssc;
+    return promise;
   }
 
   public getTextFromUrl(url: string): Promise<string> {
@@ -218,7 +224,7 @@ export class ValueBuilder {
     return a;
   }
 
-  public parseStepType(value: string): StepsType {
+  public parseStepsType(value: string): StepsType {
     return <StepsType>value.replace(/^\s+|\s+$/g, '');
   }
 
@@ -273,7 +279,7 @@ export class ValueBuilder {
     keysounds: null,
     attacks: null,
     chartname: null,
-    steptype: this.parseStepType,
+    stepstype: this.parseStepsType,
     description: null,
     difficulty: this.parseDifficultyType,
     chartstyle: null,
