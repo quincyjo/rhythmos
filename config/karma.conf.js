@@ -4,7 +4,9 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     plugins: [
       require('karma-jasmine'),
-      require('karma-chrome-launcher')
+      require('karma-chrome-launcher'),
+      require('karma-phantomjs-launcher'),
+      require('karma-ng-html2js-preprocessor')
     ],
     customLaunchers: {
       // chrome setup for travis CI using chromium
@@ -30,7 +32,12 @@ module.exports = function (config) {
       // Vendor packages might include spec files. We don't want to use those.
       'dist/vendor/**/*.spec.js'
     ],
-    preprocessors: {},
+    preprocessors: {
+      '**/*.html': ['ng-html2js']
+    },
+    ngHtml2JsPreprocessor: {
+      angular: 2
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,
