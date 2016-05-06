@@ -11,11 +11,16 @@ import {
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
 import {SongProvider} from './song-provider.service';
+import {SongsModel} from '../../models/index';
 
 
 describe('SongProvider Service', () => {
 
-  beforeEachProviders(() => [SongProvider]);
+  beforeEachProviders(() => [
+    SongsModel,
+    provide(SongProvider, {
+      deps: [SongsModel]})
+  ]);
 
 
   it('should ...', inject([SongProvider], (service:SongProvider) => {
