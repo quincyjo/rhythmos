@@ -10,16 +10,16 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing'
 import {provide} from '@angular/core';
-import {MainMenu} from './main-menu';
+import {SongDetail} from './song-detail.component';
 
 
-describe('MainMenu Component', () => {
+describe('SongDetail Component', () => {
 
   beforeEachProviders((): any[] => []);
 
 
   it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(MainMenu).then((fixture) => {
+    return tcb.createAsync(SongDetail).then((fixture) => {
       fixture.detectChanges();
     });
   }));

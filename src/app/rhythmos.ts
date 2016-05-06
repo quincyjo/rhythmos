@@ -3,11 +3,10 @@ import {Component} from '@angular/core';
 import {RouteConfig, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
 // Components
-import {MainMenu} from './components/main-menu/main-menu';
+import {MainMenu} from './components/index';
 
 // Routes
-import {SongWheelRoot} from './song-wheel/song-wheel-root.component';
-import {OptionsRoot} from './options/options-root.component';
+import {SongWheelRoot, OptionsRoot} from './routes/index';
 
 
 @Component({

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Song} from '../shared/interfaces/song';
-import {DatabaseService} from '../services/database-service/database-service';
+import {Song} from '../shared/index';
+import {DatabaseService} from '../services/index';
 import {SONGS} from './mock-songs';
 
 /**

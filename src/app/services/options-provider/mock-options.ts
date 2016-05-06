@@ -1,4 +1,4 @@
-import {Option} from '../../shared/interfaces/option';
+import {Option} from '../../shared/index';
 
 export var OPTIONS: Option[] = [
   {

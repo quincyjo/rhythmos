@@ -5,8 +5,8 @@ import {ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 
 @Component({
   selector: 'main-menu',
-  templateUrl: 'app/components/main-menu/main-menu.html',
-  styleUrls: ['app/components/main-menu/main-menu.css'],
+  templateUrl: 'app/components/main-menu/main-menu.component.html',
+  styleUrls: ['app/components/main-menu/main-menu.component.css'],
   providers: [],
   directives: [ROUTER_DIRECTIVES],
   pipes: [],

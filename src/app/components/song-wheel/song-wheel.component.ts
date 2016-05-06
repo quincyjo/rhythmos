@@ -1,13 +1,15 @@
-import {Component, HostListener} from '@angular/core';
+{
+
+}import {Component, HostListener} from '@angular/core';
 import {ROUTER_DIRECTIVES, Router, CanDeactivate, ComponentInstruction} from '@angular/router-deprecated';
-import {Song} from '../../shared/interfaces/song';
-import {SongDetail} from '../song-detail/song-detail';
-import {SongProvider} from '../../services/song-provider/song-provider';
+import {Song} from '../../shared/index';
+import {SongDetail} from '../../components/index';
+import {SongProvider} from '../../services/index';
 
 @Component({
   selector: 'song-wheel',
-  templateUrl: 'app/components/song-wheel/song-wheel.html',
-  styleUrls: ['app/components/song-wheel/song-wheel.css'],
+  templateUrl: 'app/components/song-wheel/song-wheel.component.html',
+  styleUrls: ['app/components/song-wheel/song-wheel.component.css'],
   providers: [SongProvider],
   directives: [ROUTER_DIRECTIVES, SongDetail],
   pipes: []

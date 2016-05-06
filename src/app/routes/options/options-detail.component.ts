@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {Option} from '../shared/interfaces/option';
-import {OptionsProvider} from '../services/options-provider/options-provider';
 import {RouteParams, Router} from '@angular/router-deprecated';
 import {CanDeactivate, ComponentInstruction} from '@angular/router-deprecated';
+import {Option} from '../../shared/index';
+import {OptionsProvider} from '../../services/index';
 
 @Component({
-  templateUrl: 'app/options/options-detail.component.html',
-  styleUrls: ['app/options/options-detail.component.css'],
+  templateUrl: 'app/routes/options/options-detail.component.html',
+  styleUrls: ['app/routes/options/options-detail.component.css'],
 })
 export class OptionsDetailComponent implements OnInit, CanDeactivate {
 

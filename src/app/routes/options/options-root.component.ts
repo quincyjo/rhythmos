@@ -3,7 +3,7 @@ import {RouteConfig, RouterOutlet} from '@angular/router-deprecated';
 
 import {OptionsListComponent} from './options-list.component';
 import {OptionsDetailComponent} from './options-detail.component';
-import {OptionsProvider} from '../services/options-provider/options-provider';
+import {OptionsProvider} from '../../services/index';
 
 @Component({
   template: '<router-outlet></router-outlet>',

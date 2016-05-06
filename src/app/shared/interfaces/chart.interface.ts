@@ -1,4 +1,4 @@
-import {StepsType, DifficultyType, NoteType} from '../types';
+import {StepsType, DifficultyType, NoteType} from '../types/index';
 
 export interface Chart {
   chartname: string,

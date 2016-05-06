@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Option} from '../../shared/interfaces/option';
-import {OptionsModel} from '../../models/options-model';
+import {Option} from '../../shared/index';
+import {OptionsModel} from '../../models/index';
 
 @Injectable()
 export class OptionsProvider {

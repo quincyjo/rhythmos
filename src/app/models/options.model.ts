@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Option} from '../shared/interfaces/option';
+import {Option} from '../shared/index';
 import {OPTIONS} from '../services/options-provider/mock-options';
 
 @Injectable()

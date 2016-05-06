@@ -1,4 +1,4 @@
-import {Song} from '../../shared/interfaces/song';
+import {Song} from '../../shared/index';
 
 export var SONGS: Song[] = [
   {

@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {Option} from '../shared/interfaces/option';
-import {OptionsProvider} from '../services/options-provider/options-provider';
 import {RouteConfig, RouterOutlet, RouteParams, Router} from '@angular/router-deprecated';
 import {CanDeactivate, ComponentInstruction, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
+import {Option} from '../../shared/index';
+import {OptionsProvider} from '../../services/index';
 
 @Component({
-  templateUrl: 'app/options/options-list.component.html',
-  styleUrls: ['app/options/options-list.component.css'],
+  templateUrl: 'app/routes/options/options-list.component.html',
+  styleUrls: ['app/routes/options/options-list.component.css'],
   directives: [ROUTER_DIRECTIVES],
 })
 export class OptionsListComponent implements OnInit {

@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
 import {RouteConfig, RouterOutlet} from '@angular/router-deprecated';
 
-import {SongWheel} from '../components/song-wheel/song-wheel';
-import {SongChart} from '../components/song-chart/song-chart';
+import {SongWheel, SongChart} from '../../components/index';
 
 @Component({
   template: '<router-outlet></router-outlet>',

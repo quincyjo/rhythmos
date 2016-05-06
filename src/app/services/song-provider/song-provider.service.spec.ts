@@ -10,7 +10,7 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
-import {SongProvider} from './song-provider';
+import {SongProvider} from './song-provider.service';
 
 
 describe('SongProvider Service', () => {

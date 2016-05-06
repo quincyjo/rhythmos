@@ -1,5 +1,5 @@
 import {describe, it, expect, inject, injectAsync, beforeEachProviders} from '@angular/core/testing';
-import {DatabaseService} from './database-service';
+import {DatabaseService} from './database.service';
 import {SONGS} from '../song-provider/mock-songs';
 
 describe('Database Service', () => {

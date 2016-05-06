@@ -1,11 +1,11 @@
 import {Component, Input} from '@angular/core';
-import {SongProvider} from '../../services/song-provider/song-provider';
-import {Song} from '../../shared/interfaces/song';
+import {SongProvider} from '../../services/index';
+import {Song} from '../../shared/index';
 
 @Component({
   selector: 'song-detail',
-  templateUrl: 'app/components/song-detail/song-detail.html',
-  styleUrls: ['app/components/song-detail/song-detail.css'],
+  templateUrl: 'app/components/song-detail/song-detail.component.html',
+  styleUrls: ['app/components/song-detail/song-detail.component.css'],
   providers: [],
   directives: [],
   pipes: []

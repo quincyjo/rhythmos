@@ -1,7 +1,7 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {Router, RouteParams} from '@angular/router-deprecated';
-import {Song} from '../../shared/interfaces/song';
-import {SongProvider} from '../../services/song-provider/song-provider';
+import {Song} from '../../shared/index';
+import {SongProvider} from '../../services/index';
 
 let arrow: any;
 let receptor: any;
@@ -19,8 +19,8 @@ let measureOffset: number;
 
 @Component({
   selector: 'song-chart',
-  templateUrl: 'app/components/song-chart/song-chart.html',
-  styleUrls: ['app/components/song-chart/song-chart.html'],
+  templateUrl: 'app/components/song-chart/song-chart.component.html',
+  styleUrls: ['app/components/song-chart/song-chart.component.html'],
   providers: [SongProvider],
   directives: [],
   pipes: []
@@ -227,28 +227,28 @@ export class SongChart {
         arrow.onload = () => {
           resolve();
         };
-        arrow.src = 'app/images/arrow.png';
+        arrow.src = 'assets/arrow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         receptor = new Image;
         receptor.onload = () => {
           resolve();
         };
-        receptor.src = 'app/images/receptor.png';
+        receptor.src = 'assets/receptor.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         flash = new Image;
         flash.onload = () => {
           resolve();
         };
-        flash.src = 'app/images/flash.png';
+        flash.src = 'assets/flash.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         glow = new Image;
         glow.onload = () => {
           resolve();
         };
-        glow.src = 'app/images/glow.png';
+        glow.src = 'assets/glow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
         if (this.song.background === false) {

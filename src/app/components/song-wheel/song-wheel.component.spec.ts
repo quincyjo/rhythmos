@@ -10,7 +10,7 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
-import {SongWheel} from './song-wheel';
+import {SongWheel} from './song-wheel.component';
 
 
 describe('SongWheel Component', () => {

@@ -10,7 +10,7 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
-import {OptionsProvider} from './options-provider';
+import {OptionsProvider} from './options-provider.service';
 
 
 describe('OptionsProvider Service', () => {
