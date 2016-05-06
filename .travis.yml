@@ -17,5 +17,8 @@ install:
 before_script:
   - $(npm bin)/ng build
 
+script:
+  - $(npm bin)/karma start config/karma.conf.js --browsers Chrome_travis_ci --single-run
+
 notifications:
   email: false

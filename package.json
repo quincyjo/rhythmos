@@ -16,7 +16,7 @@
     "format": "clang-format -i -style=file --glob=src/**/*.ts",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor",
-    "test": "./node_modules/.bin/karma start config/karma.conf.js --browsers Chrome_travis_ci --single-run "
+    "test": "./node_modules/.bin/karma start config/karma.conf.js --browsers PhantomJS --single-run"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
