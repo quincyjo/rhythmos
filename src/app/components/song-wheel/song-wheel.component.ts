@@ -1,7 +1,7 @@
 {
 
 }import {Component, HostListener} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router, CanDeactivate, ComponentInstruction} from '@angular/router-deprecated';
+import {ROUTER_DIRECTIVES, RouteTree, Router, OnActivate, RouteSegment} from '@angular/router';
 import {Song} from '../../shared/index';
 import {SongDetail} from '../../components/index';
 import {SongProvider} from '../../services/index';
@@ -21,6 +21,7 @@ export class SongWheel {
   public activeIndex: number;
   public bgs: Array<any>;
   private audio: HTMLAudioElement;
+  private currSegment: RouteSegment;
 
   constructor(private _songProvider: SongProvider,
               private _router: Router) {
@@ -33,6 +34,10 @@ export class SongWheel {
       this.songs = songs;
       this.select(0);
     });
+  }
+
+  routerOnActivate(curr: RouteSegment, prev: RouteSegment, currTree: RouteTree) {
+    this.currSegment = curr;
   }
 
   getSongs() {
@@ -151,10 +156,14 @@ export class SongWheel {
     }
   }
 
+  public play(id: number) {
+    this._router.navigate(['/song-wheel', id]);
+  }
+
   private _keyEnter() {
     let target = this.songs[this.activeIndex];
     if (target.id) {
-      this._router.navigate(['Play', {id: target.id}]);
+      this.play(target.id);
     }
   }
 
@@ -166,7 +175,7 @@ export class SongWheel {
     this.select((this.activeIndex - 1) < 0 ? this.songs.length - 1 : this.activeIndex - 1);
   }
 
-  routerCanDeactivate(next: ComponentInstruction, prev: ComponentInstruction): any {
+  routerCanDeactivate(): any {
     this.audio.pause();
     return true;
   }

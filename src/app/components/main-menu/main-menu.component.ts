@@ -1,6 +1,5 @@
 import {Component, HostListener} from '@angular/core';
-import {Router} from '@angular/router-deprecated';
-import {ROUTER_DIRECTIVES} from '@angular/router-deprecated';
+import {Router, RouteSegment, ROUTER_DIRECTIVES, OnActivate} from '@angular/router';
 
 
 @Component({
@@ -16,12 +15,12 @@ export class MainMenu {
   public menu = [
     {
       name: 'Play',
-      path: ['SongWheel'],
+      path: ['/song-wheel'],
       href: null
     },
     {
       name: 'Options',
-      path: ['Options'],
+      path: ['/options'],
       href: null
     },
     {
@@ -33,12 +32,18 @@ export class MainMenu {
 
   constructor(private _router: Router) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  routerOnActivate(curr: RouteSegment) {
     this.select(0);
   }
 
   public select(index: number) {
     this._activeIndex = index;
+  }
+
+  public onClick(route) {
+    this._router.navigate(route.path);
   }
 
   public isSelected(index: number) {

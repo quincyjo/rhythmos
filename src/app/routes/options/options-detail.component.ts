@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {RouteParams, Router} from '@angular/router-deprecated';
-import {CanDeactivate, ComponentInstruction} from '@angular/router-deprecated';
+import {Router, RouteSegment, OnActivate, CanDeactivate} from '@angular/router';
 import {Option} from '../../shared/index';
 import {OptionsProvider} from '../../services/index';
 
@@ -15,12 +14,13 @@ export class OptionsDetailComponent implements OnInit, CanDeactivate {
 
   constructor(
     private _service: OptionsProvider,
-    private _router: Router,
-    private _routeParams: RouteParams
+    private _router: Router
     ) { }
 
-  ngOnInit() {
-    let id = +this._routeParams.get('id');
+  ngOnInit() {}
+
+  routerOnAAnOretuor(curr: RouteSegment) {
+    let id = +curr.getParam('id');
     this._service.get(id).then(option => {
       if (option) {
         this.editLabel = option.label;
@@ -31,7 +31,7 @@ export class OptionsDetailComponent implements OnInit, CanDeactivate {
     });
   }
 
-  routerCanDeactivate(next: ComponentInstruction, prev: ComponentInstruction): any {
+  routerCanDeactivate(): any {
     if (!this.option || this.option.label === this.editLabel) {
       return true;
     }

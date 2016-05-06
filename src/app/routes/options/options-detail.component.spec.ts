@@ -12,7 +12,7 @@ import {
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
 import {OptionsDetailComponent} from './options-detail.component';
-import {Router, RouteParams} from '@angular/router-deprecated';
+import {Router, RouteSegment} from '@angular/router';
 import {Option} from '../../shared/index';
 import {OptionsProvider} from '../../services/index';
 
@@ -28,10 +28,6 @@ class MockRouter {
   navigate() { }
 };
 
-class MockRouteParams {
-  get() { return 1; }
-};
-
 describe('OptionsDetailComponent', () => {
   let tcb;
 
@@ -39,9 +35,8 @@ describe('OptionsDetailComponent', () => {
     TestComponentBuilder,
     provide(OptionsProvider, {useClass: MockOptionsProvider}),
     provide(Router, {useClass: MockRouter}),
-    provide(RouteParams, {useClass: MockRouteParams}),
     provide(OptionsDetailComponent, {
-      deps: [OptionsProvider, Router, RouteParams]})
+      deps: [OptionsProvider, Router]})
   ]);
 
   beforeEach(inject([TestComponentBuilder], (_tcb) => {
@@ -52,8 +47,7 @@ describe('OptionsDetailComponent', () => {
     return tcb
     .overrideProviders(OptionsDetailComponent, [
       provide(OptionsProvider, {useClass: MockOptionsProvider}),
-      provide(Router, {useClass: MockRouter}),
-      provide(RouteParams, {useClass: MockRouteParams})
+      provide(Router, {useClass: MockRouter})
     ])
     .createAsync(OptionsDetailComponent)
     .then((fixture) => {

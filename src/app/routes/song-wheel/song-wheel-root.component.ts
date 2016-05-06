@@ -1,17 +1,17 @@
 import {Component} from '@angular/core';
-import {RouteConfig, RouterOutlet} from '@angular/router-deprecated';
+import {Router, RouteSegment, OnActivate, Routes, ROUTER_DIRECTIVES} from '@angular/router';
 
 import {SongWheel, SongChart} from '../../components/index';
 
 @Component({
   template: '<router-outlet></router-outlet>',
   providers: [],
-  directives: [RouterOutlet]
+  directives: [ROUTER_DIRECTIVES]
 })
-@RouteConfig([
-  {path:'/', name: 'SongWheel', component: SongWheel, useAsDefault: true},
-  {path:'/:id', name: 'Play', component: SongChart}
+@Routes([
+  {path:'', component: SongWheel},
+  {path:'/:id', component: SongChart}
 ])
 export class SongWheelRoot {
-  constructor() {}
+  constructor(private _router: Router) {}
 }

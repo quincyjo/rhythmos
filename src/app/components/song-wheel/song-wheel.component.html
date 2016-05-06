@@ -17,11 +17,11 @@
     </div>
     <div class="wheel">
       <ul class="songs">
-        <li class="song" let item
+        <li class="song"
           *ngFor="let song of songs; let i = index;"
           (mouseenter)="select(i)"
-          [ngClass]="{'selected': isSelected(i)}"
-          [routerLink]="['Play', {'id': song.id}]">
+          (click)="play(song.id)"
+          [ngClass]="{'selected': isSelected(i)}">
           <h2 class="song-title">{{song.title}}</h2>
           <h3 class="song-subtitle">{{song.subtitle}}</h3>
           <h4 class="song-artist">~{{song.artist}}</h4>

@@ -10,7 +10,7 @@ import {
   beforeEachProviders
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing'
-import {Router} from '@angular/router-deprecated';
+import {Router} from '@angular/router';
 import {provide} from '@angular/core';
 import {MainMenu} from './main-menu.component';
 

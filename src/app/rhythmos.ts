@@ -1,6 +1,6 @@
 // @angular
 import {Component} from '@angular/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
+import {Router, Routes, ROUTER_DIRECTIVES} from '@angular/router';
 
 // Components
 import {MainMenu} from './components/index';
@@ -17,12 +17,16 @@ import {SongWheelRoot, OptionsRoot} from './routes/index';
   directives: [ROUTER_DIRECTIVES, MainMenu],
   pipes: []
 })
-@RouteConfig([
-  {path:'/', name: 'Rhythmos', component: MainMenu, useAsDefault: true},
-  {path:'/song-wheel/...', name: 'SongWheel', component: SongWheelRoot},
-  {path:'/options/...', name: 'Options', component: OptionsRoot}
+@Routes([
+  {path:'/',               component: MainMenu},
+  {path:'/song-wheel', component: SongWheelRoot},
+  {path:'/options',    component: OptionsRoot}
 ])
 export class RhythmosAppComponent {
 
-  constructor() {}
+  constructor(private _router: Router) {}
+
+  ngOnInit() {
+    this._router.navigate(['/']);
+  }
 }

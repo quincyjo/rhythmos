@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {RouteConfig, RouterOutlet, RouteParams, Router} from '@angular/router-deprecated';
-import {CanDeactivate, ComponentInstruction, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
+import {ROUTER_DIRECTIVES, Router, RouteSegment, OnActivate, CanDeactivate} from '@angular/router';
 import {Option} from '../../shared/index';
 import {OptionsProvider} from '../../services/index';
 
@@ -15,12 +14,13 @@ export class OptionsListComponent implements OnInit {
 
   constructor(
     private _optionsProvider: OptionsProvider,
-    private _router: Router,
-    private _routeParams: RouteParams
+    private _router: Router
     ) {}
 
-  ngOnInit() {
-    let id = +this._routeParams.get('id');
+  ngOnInit() {}
+
+  routerCanDeactivate(curr: RouteSegment) {
+    let id = +curr.getParam('id');
     if (id) {
       this._optionsProvider.get(id).then(option => {
         this.option = option;

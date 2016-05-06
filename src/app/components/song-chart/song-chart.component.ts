@@ -1,5 +1,5 @@
 import {Component, HostListener, Input} from '@angular/core';
-import {Router, RouteParams} from '@angular/router-deprecated';
+import {OnActivate, Router, RouteSegment} from '@angular/router';
 import {Song} from '../../shared/index';
 import {SongProvider} from '../../services/index';
 
@@ -38,12 +38,11 @@ export class SongChart {
 
   constructor(
     private _songProvider: SongProvider,
-    private _router: Router,
-    private _routeParams: RouteParams
+    private _router: Router
     ) {}
 
-  ngOnInit() {
-    let id = +this._routeParams.get('id');
+  routerOnActivate(curr: RouteSegment) {
+    let id = +curr.getParam('id');
     factory = new StepFactory();
     scoreBoard = new ScoreBoard();
     this._keys = [0, 0, 0, 0];
@@ -64,6 +63,8 @@ export class SongChart {
       });
     });
   }
+
+  ngOnInit() {}
 
   public start() {
     this._continue = true;

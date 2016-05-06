@@ -20,7 +20,7 @@ const barrels: string[] = [
   '@angular/compiler',
   '@angular/http',
   '@angular/router',
-  '@angular/router-deprecated',
+  '@angular/router',
   '@angular/platform-browser',
   '@angular/platform-browser-dynamic',
 

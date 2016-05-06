@@ -11,7 +11,7 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
 import {provide} from '@angular/core';
-import {Router} from '@angular/router-deprecated';
+import {Router} from '@angular/router';
 import {SongWheel} from './song-wheel.component';
 import {SongProvider} from '../../services/index';
 

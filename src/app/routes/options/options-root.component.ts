@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {RouteConfig, RouterOutlet} from '@angular/router-deprecated';
+import {ROUTER_DIRECTIVES, Routes} from '@angular/router';
 
 import {OptionsListComponent} from './options-list.component';
 import {OptionsDetailComponent} from './options-detail.component';
@@ -8,12 +8,12 @@ import {OptionsProvider} from '../../services/index';
 @Component({
   template: '<router-outlet></router-outlet>',
   providers: [OptionsProvider],
-  directives: [RouterOutlet]
+  directives: [ROUTER_DIRECTIVES]
 })
-@RouteConfig([
-  {path:'/:id', name: 'OptionsList', component: OptionsListComponent},
-  {path:'/', name: 'OptionsList', component: OptionsListComponent, useAsDefault: true},
-  {path:'/:id/...', name: 'OptionsDetail', component: OptionsRoot}
+@Routes([
+  {path:'/:id', component: OptionsListComponent},
+  {path:'/', component: OptionsListComponent},
+  {path:'/:id/...', component: OptionsRoot}
 ])
 export class OptionsRoot {
   constructor() {}

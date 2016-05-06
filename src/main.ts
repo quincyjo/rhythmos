@@ -1,6 +1,6 @@
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
-import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
+import {Router, ROUTER_PROVIDERS} from '@angular/router';
 import { RhythmosAppComponent, environment } from './app/index';
 import {DatabaseService} from './app/services/index';
 import {SongsModel, OptionsModel} from './app/models/index';
