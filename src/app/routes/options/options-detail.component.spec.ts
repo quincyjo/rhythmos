@@ -6,6 +6,7 @@ import {
   expect,
   inject,
   injectAsync,
+  beforeEach,
   beforeEachProviders
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
@@ -21,28 +22,45 @@ class MockOptionsProvider {
       [{id:1, label:'one', value:0, dirty:false, values:['Default'], tags:[], children:[]}]
     );
   }
-}
+};
 
 class MockRouter {
   navigate() { }
-}
+};
 
 class MockRouteParams {
   get() { return 1; }
-}
+};
 
 describe('OptionsDetailComponent', () => {
+  let tcb;
 
   beforeEachProviders(() => [
+    TestComponentBuilder,
     provide(OptionsProvider, {useClass: MockOptionsProvider}),
     provide(Router, {useClass: MockRouter}),
     provide(RouteParams, {useClass: MockRouteParams}),
+    provide(OptionsDetailComponent, {
+      deps: [OptionsProvider, Router, RouteParams]})
   ]);
 
-  it('should ...', injectAsync([TestComponentBuilder], (tcb:TestComponentBuilder) => {
-    return tcb.createAsync(OptionsDetailComponent).then((fixture) => {
-      fixture.detectChanges();
-    });
+  beforeEach(inject([TestComponentBuilder], (_tcb) => {
+    tcb = _tcb;
   }));
+
+  it('should ...', done => {
+    return tcb
+    .overrideProviders(OptionsDetailComponent, [
+      provide(OptionsProvider, {useClass: MockOptionsProvider}),
+      provide(Router, {useClass: MockRouter}),
+      provide(RouteParams, {useClass: MockRouteParams})
+    ])
+    .createAsync(OptionsDetailComponent)
+    .then((fixture) => {
+      fixture.detectChanges();
+      done();
+    })
+    .catch(e => done());
+  });
 
 });
