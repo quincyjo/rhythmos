@@ -11,16 +11,14 @@ import {
 } from '@angular/core/testing';
 import {TestComponentBuilder} from '@angular/compiler/testing';
 
-import {SscReader, ChartBuilder, ValueBuilder} from './ssc-reader.service';
+import {SscReader} from './ssc-reader.service';
 import {Ssc, SscChart} from '../../shared/interfaces';
 import {StepsType, NoteType, DifficultyType, STEPSCOLUMNS} from '../../shared/types';
 
 describe('SscReader', () => {
 
   beforeEachProviders(() => [
-    SscReader,
-    ChartBuilder,
-    ValueBuilder
+    SscReader
   ]);
 
   it('should strip comments', inject([SscReader], (sscReader => {
@@ -31,8 +29,8 @@ describe('SscReader', () => {
   })));
 
   it('should strip whitespace', inject([SscReader], (sscReader => {
-    let input = 'This has\rlots\tof\nwhitespace!';
-    let target = 'Thishaslotsofwhitespace!';
+    let input = '  This has\rlots\tof\nwhitespace! ';
+    let target = 'This haslotsofwhitespace!';
     let output = sscReader.strip(input);
     expect(output).toEqual(target);
   })));
