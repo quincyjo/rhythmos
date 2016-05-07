@@ -1,6 +1,7 @@
 import {SmChart} from './';
 
 export interface Sm {
+  format: string,
   title: string,
   subtitle: string,
   artist: string,

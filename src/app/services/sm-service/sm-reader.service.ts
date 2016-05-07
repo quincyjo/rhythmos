@@ -51,7 +51,7 @@ export class SmFactory {
 
   public makeSm(): Sm {
     return {
-      title:'',subtitle:'',artist:'',titletranslit:'',subtitletranslit:'',artisttranslit:'',
+      format:'sm',title:'',subtitle:'',artist:'',titletranslit:'',subtitletranslit:'',artisttranslit:'',
       genre:'',credit:'',banner:'',background:'',lyricspath:'',cdtitle:'',music:'',offset:0,
       samplestart:0,samplelength:0,selectable:true,bpms:[],stops:[],bgchanges:'',attacks:'',
       notedata:[]}

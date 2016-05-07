@@ -49,7 +49,7 @@ export class SscFactory {
 
   public makeSsc(): Ssc {
     return {
-      version:0,title:'',subtitle:'',artist:'',titletranslit:'',subtitletranslit:'',
+      format:'ssc',version:0,title:'',subtitle:'',artist:'',titletranslit:'',subtitletranslit:'',
       artisttranslit:'',genre:'',origin:'',credit:'',banner:'',background:'',previewvid:'',
       jacket:'',cdimage:'',discimage:'',lyricspath:'',cdtitle:'',music:'',offset:0,
       samplestart:0,samplelength:0,selectable:true,displaybpm:'',bpms:[],stops:[],

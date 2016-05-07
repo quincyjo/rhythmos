@@ -1,6 +1,7 @@
 import {SscChart} from './';
 
 export interface Ssc {
+  format: string,
   version: number,
   title: string,
   subtitle: string,
