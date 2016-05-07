@@ -152,7 +152,7 @@ let attributeFromTag = (tag: string): string => {
 // Null means desired target value is a string, so do nothing.
 // False means that the value builder should not have been pased that tag.
 let tagMap = {
-  version: null,
+  version: parseNumber,
   title: null,
   subtitle: null,
   artist: null,

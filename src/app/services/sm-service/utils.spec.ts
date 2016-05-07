@@ -99,6 +99,7 @@ describe('SMUTILS', () => {
 
     it('should parse somethings as numbers', () => {
       let input = [
+        {tag: 'version', value: '0.83', target: 0.83},
         {tag: 'offset', value: '1', target: 1},
         {tag: 'samplestart', value: '1.359', target: 1.359},
         {tag: 'samplelength', value: '213.1', target: 213.1},
