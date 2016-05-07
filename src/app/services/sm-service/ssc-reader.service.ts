@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Ssc, Chart} from '../../shared/index';
+import {Ssc, SscChart} from '../../shared/index';
 import {StepsType, NoteType, STEPSCOLUMNS, DifficultyType} from '../../shared/types/index';
 
 
@@ -62,8 +62,10 @@ export class SscReader {
   public strip(str: string): string {
     // Strip comments
     let nocomments = str.replace(/(\/\/.*[\r\n])/g, '');
-    // Strip whitespace
-    return nocomments.replace(/[\r\n\t\s]/g, '');
+    // Strip trailing and leading whitespace
+    let notrails = nocomments.replace(/(^\s+)|(\s+$)/g, '')
+    // Strip line breaks and non-space whitespace
+    return notrails.replace(/([\r\n\t])/g, '');
   }
 
   public split(str: string): Array<Array<string>> {
@@ -203,7 +205,7 @@ export class ValueBuilder {
     return a;
   }
 
-  public praseNumberArray(value: string): Array<number> {
+  public parseNumberArray(value: string): Array<number> {
     let a: Array<number> = [];
     value.split(',').map((elem) => {
       a.push(parseFloat(elem));
@@ -283,7 +285,7 @@ export class ValueBuilder {
     difficulty: this.parseDifficultyType,
     chartstyle: null,
     meter: this.parseNumber,
-    radarvalues: this.parseNumber,
+    radarvalues: this.parseNumberArray,
     notedata: false,
     notes: false,
     default: this.parseDefault

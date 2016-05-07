@@ -12,7 +12,7 @@ import {
 import {TestComponentBuilder} from '@angular/compiler/testing';
 
 import {SscReader, ChartBuilder, ValueBuilder} from './ssc-reader.service';
-import {Ssc, Chart} from '../../shared/interfaces';
+import {Ssc, SscChart} from '../../shared/interfaces';
 import {StepsType, NoteType, DifficultyType, STEPSCOLUMNS} from '../../shared/types';
 
 describe('SscReader', () => {
