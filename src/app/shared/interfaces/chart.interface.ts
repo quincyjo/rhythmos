@@ -1,6 +1,6 @@
 import {StepsType, DifficultyType, NoteType} from '../types/index';
 
-export interface Chart {
+export interface SscChart {
   chartname: string,
   stepstype: StepsType,
   description: string,
@@ -22,5 +22,14 @@ export interface Chart {
   fakes: Object,
   labels: Object,
   displaybpm: number,
+  notes: Array<Array<Array<NoteType>>>
+}
+
+export interface SmChart {
+  stepstype: StepsType,
+  description: string,
+  difficulty: DifficultyType,
+  meter: number,
+  radarvalues: Array<number>,
   notes: Array<Array<Array<NoteType>>>
 }

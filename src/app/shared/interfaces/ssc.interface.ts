@@ -1,4 +1,4 @@
-import {Chart} from './';
+import {SscChart} from './';
 
 export interface Ssc {
   version: number,
@@ -39,5 +39,5 @@ export interface Ssc {
   bgchanges: any,
   keysounds: any,
   attacks: any,
-  notedata: Array<Chart>
+  notedata: Array<SscChart>
 }
