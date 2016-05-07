@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Ssc, SscChart} from '../../shared/index';
 import {StepsType, NoteType, STEPSCOLUMNS, DifficultyType} from '../../shared/types/index';
-import {VALUEBUILDER} from './utils';
+import {SMUTILS} from './utils';
 
 
 let chartBuilder: ChartBuilder;
+let factory: SscFactory;
 
 
 @Injectable()
@@ -12,82 +13,67 @@ export class SscReader {
 
   constructor() {
     chartBuilder = new ChartBuilder();
+    factory = new SscFactory();
   }
 
   public readFromUrl(url: string): Promise<Ssc> {
     let promise = new Promise<Ssc>((resolve, reject) => {
-      let ssc = {notedata: []};
-      this.getTextFromUrl(url).then((value) => {
-        let text = this.strip(value);
-        let split = this.split(text);
+      let ssc = factory.makeSsc();
+      SMUTILS.getTextFromUrl(url).then((value) => {
+        let text = SMUTILS.stripFile(value);
+        let split = SMUTILS.splitTags(text);
         split.map((elem) => {
-          elem[0] = this.attributeFromTag(elem[0]);
+          elem[0] = SMUTILS.attributeFromTag(elem[0]);
         })
         for (let i = 0; i < split.length; i++) {
           let elem = split[i];
           let tag = elem[0];
           let value = elem[1];
           if (tag != 'notedata') {
-            ssc[tag] = VALUEBUILDER.buildValue(tag, value);
+            ssc[tag] = SMUTILS.parseValue(tag, value);
           } else {
             ssc.notedata.push(chartBuilder.buildChart(split, i));
           }
         }
-        resolve (<Ssc>ssc);
+        resolve (ssc);
       });
     });
     return promise;
   }
+}
 
-  public getTextFromUrl(url: string): Promise<string> {
-    let promise = new Promise((resolve, reject) => {
-      let xhr = new XMLHttpRequest(),
-          text: string;
-      xhr.open('GET', url, true);
-      xhr.responseType = 'text';
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          text = xhr.response;
-          resolve(text);
-        } else {
-          reject('XMLHttpRequest filed with code: ' + xhr.status);
-        }
-      }, false);
-      xhr.send();
-    });
-    return promise;
+
+export class SscFactory {
+
+  constructor() {}
+
+  public makeSsc(): Ssc {
+    return {
+      version:0,title:'',subtitle:'',artist:'',titletranslit:'',subtitletranslit:'',
+      artisttranslit:'',genre:'',origin:'',credit:'',banner:'',background:'',previewvid:'',
+      jacket:'',cdimage:'',discimage:'',lyricspath:'',cdtitle:'',music:'',offset:0,
+      samplestart:0,samplelength:0,selectable:true,displaybpm:'',bpms:[],stops:[],
+      delays:[],warps:[],timesignatures:[],tickcounts:[],combos:[],speeds:[],scrolls:[],
+      fakes:[],labels:{},bgchanges:null,keysounds:null,attacks:null,notedata:[]};
   }
 
-  public strip(str: string): string {
-    // Strip comments
-    let nocomments = str.replace(/(\/\/.*[\r\n])/g, '');
-    // Strip trailing and leading whitespace
-    let notrails = nocomments.replace(/(^\s+)|(\s+$)/g, '')
-    // Strip line breaks and non-space whitespace
-    return notrails.replace(/([\r\n\t])/g, '');
-  }
-
-  public split(str: string): Array<Array<string>> {
-    let split = str.split(';').map((elem) => {
-      return elem.split(':');
-    });
-    split.splice(split.length - 1, 1);
-    return split;
-  }
-
-  public attributeFromTag(tag: string): string {
-    return tag.substr(1).toLowerCase();
+  public makeChart(): SscChart {
+    return {
+      chartname:'',stepstype:'dance-single',description:'',chartstyle:'',difficulty:'Beginner',
+      meter:0,radarvalues:[],credit:'',offset:0,bpms:[],stops:[],delays:[],warps:[],
+      timesignatures:[],tickcounts:[],combos:[],speeds:[],scrolls:[],fakes:{},labels:{},
+      displaybpm:'',notes:[]};
   }
 }
 
 
 export class ChartBuilder {
-  public chart: Object;
+  public chart: SscChart;
 
   constructor() {}
 
-  public buildChart(tags: any, index: number): any {
-    this.chart = {};
+  public buildChart(tags: Array<Array<string>>, index: number): SscChart {
+    this.chart = factory.makeChart();
     let i = index + 1;
     while (tags[i] && tags[i][0] != 'notedata') {
       let tag = tags[i][0];
@@ -95,7 +81,7 @@ export class ChartBuilder {
       if (tag == 'notes') {
         this.chart[tag] = this.parseNotes(value);
       } else {
-        this.chart[tag] = VALUEBUILDER.buildValue(tag, value);
+        this.chart[tag] = SMUTILS.parseValue(tag, value);
       }
       i++;
     }
@@ -105,8 +91,8 @@ export class ChartBuilder {
 
   public parseNotes(value: string): Array<Array<Array<NoteType>>> {
     let notes: Array<Array<Array<NoteType>>> = [];
-    let stepType: StepsType = this.chart['stepstype'];
-    let rowLength = STEPSCOLUMNS[stepType];
+    let stepsType: StepsType = this.chart.stepstype;
+    let rowLength = STEPSCOLUMNS[stepsType];
 
     value.split(',').map((measure) => {
       let mes: Array<Array<NoteType>> = [];

@@ -18,8 +18,8 @@ export interface Sm {
   samplestart: number,
   samplelength: number,
   selectable: boolean,
-  bpms: Array<{measure: number, value: number}>,
-  stops: Array<{measure: number, value: number}>,
+  bpms: Array<{beat: number, value: number}>,
+  stops: Array<{beat: number, value: number}>,
   bgchanges: any,
   attacks: any,
   notedata: Array<SmChart>

@@ -10,18 +10,18 @@ export interface SscChart {
   radarvalues: Array<number>,
   credit: string,
   offset: number,
-  bpms: Array<{measure: number, bpm: number}>,
+  bpms: Array<{beat: number, bpm: number}>,
   stops: Array<Object>,
   delays: Array<Object>,
   warps: Array<Object>,
-  timesignatures: Array<{measure: number, beats: number, note: number}>
-  tickcounts: Array<{measure: number, value: number}>,
-  combos: Array<{measure: number, value: number}>,
+  timesignatures: Array<{beat: number, beats: number, note: number}>
+  tickcounts: Array<{beat: number, value: number}>,
+  combos: Array<{beat: number, value: number}>,
   speeds: Array<Object>,
-  scrolls: Array<{measure: number, value: number}>,
+  scrolls: Array<{beat: number, value: number}>,
   fakes: Object,
   labels: Object,
-  displaybpm: number,
+  displaybpm: string,
   notes: Array<Array<Array<NoteType>>>
 }
 

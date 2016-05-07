@@ -1,6 +1,6 @@
 import {StepsType, DifficultyType} from '../../shared/types/index';
 
-let buildValue = (tag: string, value: string) => {
+let parseValue = (tag: string, value: string) => {
   // Get method from tag map.
   let func = tagMap[tag];
   if (func == null) { // Target value is a string, string trailing whitespace and return.
@@ -27,13 +27,13 @@ let parseBoolean = (value: string): boolean => {
   return false;
 }
 
-let parseMeasureValueArray = (value: string): Array<{measure: number, value: number}> => {
-  let a: Array<{measure: number, value: number}> = [];
+let parseBeatValueArray = (value: string): Array<{beat: number, value: number}> => {
+  let a: Array<{beat: number, value: number}> = [];
   if (value == '') return a;
   value.split(',').map((elem) => {
     let values = elem.split('=');
     a.push({
-      measure: parseFloat(values[0]),
+      beat: parseFloat(values[0]),
       value: parseFloat(values[1])
     });
   });
@@ -57,10 +57,10 @@ let parseLabelValueArray = (value: string): Object => {
   return map;
 }
 
-let parseMeasureFractionArray = (value: string): Array<{measure: number,
+let parseMeasureFractionArray = (value: string): Array<{beat: number,
                                                         numerator: number,
                                                         denominator: number}> => {
-  let a: Array<{measure: number, numerator: number, denominator: number}> = [];
+  let a: Array<{beat: number, numerator: number, denominator: number}> = [];
   if (value == '') return a;
   value.split(',').map((elem) => {
     let values = elem.split('=');
@@ -68,7 +68,7 @@ let parseMeasureFractionArray = (value: string): Array<{measure: number,
     let numerator = parseFloat(values[1]);
     let denominator = parseFloat(values[2]);
     a.push({
-      measure: measure,
+      beat: measure,
       numerator: numerator,
       denominator: denominator
     });
@@ -108,6 +108,46 @@ let parseDefault = () => {
   return false;
 }
 
+let getTextFromUrl = (url: string): Promise<string> => {
+  let promise = new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest(),
+        text: string;
+    xhr.open('GET', url, true);
+    xhr.responseType = 'text';
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 200) {
+        text = xhr.response;
+        resolve(text);
+      } else {
+        reject('XMLHttpRequest filed with code: ' + xhr.status);
+      }
+    }, false);
+    xhr.send();
+  });
+  return promise;
+}
+
+let stripFile = (str: string): string => {
+  // Strip comments
+  let nocomments = str.replace(/(\/\/.*[\r\n])/g, '');
+  // Strip trailing and leading whitespace
+  let notrails = nocomments.replace(/(^\s+)|(\s+$)/g, '')
+  // Strip line breaks and non-space whitespace
+  return notrails.replace(/([\r\n\t])/g, '');
+}
+
+let splitTags = (str: string): Array<Array<string>> => {
+  let split = str.split(';').map((elem) => {
+    return elem.split(':');
+  });
+  split.splice(split.length - 1, 1);
+  return split;
+}
+
+let attributeFromTag = (tag: string): string => {
+  return tag.substr(1).toLowerCase();
+}
+
 // List of all official tags, with appropriate method.
 // Null means desired target value is a string, so do nothing.
 // False means that the value builder should not have been pased that tag.
@@ -135,17 +175,17 @@ let tagMap = {
   samplestart: parseNumber,
   samplelength: parseNumber,
   selectable: parseBoolean,
-  displaybpm: parseNumber,
-  bpms: parseMeasureValueArray,
-  stops: parseMeasureValueArray,
-  delays: parseMeasureValueArray,
-  warps: parseMeasureValueArray,
+  displaybpm: null,
+  bpms: parseBeatValueArray,
+  stops: parseBeatValueArray,
+  delays: parseBeatValueArray,
+  warps: parseBeatValueArray,
   timesignatures: parseMeasureFractionArray,
-  tickcounts: parseMeasureValueArray,
-  combos: parseMeasureValueArray,
+  tickcounts: parseBeatValueArray,
+  combos: parseBeatValueArray,
   speeds: parseTwoDimNumberArray,
-  scrolls: parseMeasureValueArray,
-  fakes: parseMeasureValueArray,
+  scrolls: parseBeatValueArray,
+  fakes: parseBeatValueArray,
   labels: parseLabelValueArray,
   bgchanges: null,
   keysounds: null,
@@ -162,6 +202,10 @@ let tagMap = {
   default: parseDefault
 };
 
-export const VALUEBUILDER = {
-  buildValue: buildValue
+export const SMUTILS = {
+  parseValue: parseValue,
+  getTextFromUrl: getTextFromUrl,
+  stripFile: stripFile,
+  splitTags: splitTags,
+  attributeFromTag: attributeFromTag
 }
