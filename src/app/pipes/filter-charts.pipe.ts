@@ -5,6 +5,7 @@ import {StepsType} from '../shared/types/index';
 @Pipe({name: 'filterCharts'})
 export class FilterChartsPipe implements PipeTransform {
   transform(value: Array<SongChart>, type: string): Array<SongChart> {
+    console.log(value, type);
     if (!Array.isArray(value) || value.length > 0 && typeof value[0] != 'object') {
       throw 'sortCharts requires an array of SongCharts objects as input';
     }

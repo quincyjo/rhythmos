@@ -28,11 +28,10 @@ h2.song-title {
   display: block;
   width: 100%;
   height: 30px;
-  opacity: 0.8;
   margin: 0;
   padding: 0 10px;
-  background: #000;
-  color: #ddd;
+  background: rgba(50,50,50,0.75);
+  color: #eee;
   font-size: 1em;
   line-height: 30px;
   vertical-align: middle;
@@ -53,16 +52,22 @@ h2.song-title {
   flex: 1 1 auto;
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 200px;
   overflow: hidden;
 }
 
 .chart-select {
-  height: 50px;
-  width: 75px;
-  color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  height: 36px;
+  width: 100px;
+  color: #eee;
   position: relative;
   margin-bottom: 5px;
+  opacity: 0.6;
+  transition: 0.25s ease;
+  display: flex;
+  flex-direction: row;
 }
 
 .chart-select.Beginner {
@@ -89,21 +94,50 @@ h2.song-title {
   background-color: rgb(23, 23, 43);
 }
 
+.chart-select.selected {
+  color: #fff;
+  opacity: 1;
+  box-shadow: 0 0px 10px rgba(0, 0, 0, 0.25);
+}
+
+.chart-select .left {
+  flex: 0 1 40px;
+  padding:2px;
+}
+
+.chart-select .right {
+  background: rgba(0, 0, 0, 0.25);
+  flex: 0 1 60px;
+}
+
 .chart-select .meter {
-  width: 75px;
+  display: block;
+  line-height: 36px;
+  font-size: 25px;
+  vertical-align: middle;
   text-align: center;
-  font-size: 50px;
 }
 
 .chart-select .difficulty {
   text-transform: uppercase;
-  height:20px;
-  width: 50px;
+  display: block;
+  height: 20px;
+  line-height: 20px;
+  font-size: 20px;
   padding: 0;
   margin: 0;
+  vertical-align: middle;
   text-align: center;
 }
 
 .chart-select .stepstype {
-
+  text-transform: capitalize;
+  display: block;
+  height: 12px;
+  line-height: 12px;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  vertical-align: middle;
+  text-align: center;
 }

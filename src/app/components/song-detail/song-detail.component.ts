@@ -1,7 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {SongProvider} from '../../services/index';
-import {Song} from '../../shared/classes/index';
-import {SortChartsPipe} from '../../pipes/index';
+import {Song, SongChart} from '../../shared/classes/index';
+import {StepsType, DifficultyType} from '../../shared/types/index';
+import {FilterChartsPipe, SortChartsPipe, FormatDifficultyPipe, FormatStepstypePipe} from '../../pipes/index';
 
 @Component({
   selector: 'song-detail',
@@ -9,11 +10,18 @@ import {SortChartsPipe} from '../../pipes/index';
   styleUrls: ['app/components/song-detail/song-detail.component.css'],
   providers: [],
   directives: [],
-  pipes: [SortChartsPipe]
+  pipes: [FilterChartsPipe, SortChartsPipe, FormatDifficultyPipe, FormatStepstypePipe]
 })
 
 export class SongDetail {
   @Input() song: Song;
+  @Input() preferedChart: {
+    stepstype: StepsType,
+    difficulty: DifficultyType
+  };
+  @Output() selectChart = new EventEmitter();
+
+  public selected: SongChart;
 
   constructor(private _songProvider: SongProvider) {}
 
@@ -31,5 +39,16 @@ export class SongDetail {
     } else {
       return '#000';
     }
+  }
+
+  public select(chart: SongChart) {
+    this.selectChart.emit(chart);
+  }
+
+  public isSelected(chart: SongChart): boolean {
+    return (
+      chart.stepstype === this.preferedChart.stepstype &&
+      chart.difficulty === this.preferedChart.difficulty
+    );
   }
 }

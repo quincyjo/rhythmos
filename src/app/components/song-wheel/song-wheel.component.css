@@ -2,6 +2,11 @@
   box-sizing: border-box;
   border: 0;
   padding: 0;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #song-wheel {
@@ -80,7 +85,7 @@
 
 .song-detail {
   flex: 0 1 60%;
-  max-width: 600px;
+  max-width: 700px;
   margin: 25px auto;
 }
 
@@ -104,6 +109,10 @@
   background-size: 200% 100%;
   background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25)) 0% 100%/200% 100%;
   transition: background-position 0.25s;
+}
+
+.wheel ul.songs li.song:hover{
+  background-position: 20% 0;
 }
 
 .wheel ul.songs li.song.selected {

@@ -1,6 +1,6 @@
 <div id="song-wheel">
   <div class="title">
-    <h1>Select Music:</h1>
+    <h1>{{title}}:</h1>
   </div>
   <div class="content">
     <div class="background"
@@ -12,7 +12,10 @@
         'background': bg
       }"></div>
     <div class="song-detail">
-      <song-detail [song]="getSelected()"></song-detail>
+      <song-detail
+      [song]="getSelected()"
+      [preferedChart]="preferedChartType"
+      (selectChart) = "selectChart($event)"></song-detail>
     </div>
     <div class="wheel">
       <div class="loading"
@@ -20,8 +23,8 @@
       <ul class="songs">
         <li class="song" let li
           *ngFor="let song of songs; let i = index;"
-          (mouseenter)="select(i)"
-          (click)="play(song.id)"
+          (click)="select(i)"
+          (dblclick)="play(song.id)"
           [ngClass]="{'selected': isSelected(i)}">
           <h2 class="song-title">{{song.getMeta().title}}</h2>
           <h3 class="song-subtitle">{{song.getMeta().subtitle}}</h3>

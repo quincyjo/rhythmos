@@ -2,9 +2,10 @@
 
 }import {Component, HostListener} from '@angular/core';
 import {ROUTER_DIRECTIVES, RouteTree, Router, OnActivate, RouteSegment} from '@angular/router';
-import {Song} from '../../shared/classes/index';
+import {Song, SongChart} from '../../shared/classes/index';
 import {SongDetail} from '../../components/index';
 import {SongProvider} from '../../services/index';
+import {StepsType, DifficultyType} from '../../shared/types/index';
 
 @Component({
   selector: 'song-wheel',
@@ -16,16 +17,21 @@ import {SongProvider} from '../../services/index';
   pipes: []
 })
 export class SongWheel {
-  public title = 'Songs';
+  public title = 'Music Select';
   public songs: Array<Song>;
   public selectedSong: Song;
   public activeIndex: number;
+  public preferedChartType: {stepstype: StepsType, difficulty: DifficultyType};
   public bgs: Array<any>;
   private audio: HTMLAudioElement;
   private currSegment: RouteSegment;
 
   constructor(private _songProvider: SongProvider,
               private _router: Router) {
+                this.preferedChartType = {
+                  stepstype: 'dance-single',
+                  difficulty: 'Beginner'
+                };
                 this.bgs = [];
                 this.audio = new Audio;
               }
@@ -37,6 +43,11 @@ export class SongWheel {
         this.select(0);
       }
     });
+  }
+
+  selectChart(chart: SongChart) {
+    this.preferedChartType.stepstype = chart.stepstype;
+    this.preferedChartType.difficulty = chart.difficulty;
   }
 
   routerOnActivate(curr: RouteSegment, prev: RouteSegment, currTree: RouteTree) {
@@ -93,7 +104,7 @@ export class SongWheel {
       }
     };
     this.audio.addEventListener('timeupdate', this._audioListener, false);
-    //this.audio.play();
+    this.audio.play();
   }
 
   public fetchBackground() {
@@ -162,7 +173,16 @@ export class SongWheel {
   }
 
   public play(id: number) {
-    this._router.navigate(['/song-wheel', id, 0]);
+    let song = this.songs[this.activeIndex];
+    let chartIndex = song.getCharts().findIndex((chart) => {
+      return (
+        chart.stepstype === this.preferedChartType.stepstype &&
+        chart.difficulty === this.preferedChartType.difficulty
+      );
+    })
+    if (chartIndex != -1) {
+      this._router.navigate(['/song-wheel', id, chartIndex]);
+    }
   }
 
   private _keyEnter() {

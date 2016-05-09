@@ -42,8 +42,8 @@ describe('Pipe: FormatStesptype', () => {
     expect(pipe.transform('dance-single')).toEqual('single');
     expect(pipe.transform('dance-solo')).toEqual('solo');
     expect(pipe.transform('dance-double')).toEqual('double');
-    expect(pipe.transform('pump-single')).toEqual('single (pump)');
-    expect(pipe.transform('ez2-single')).toEqual('single (ez2)');
+    expect(pipe.transform('pump-single')).toEqual('single');
+    expect(pipe.transform('ez2-single')).toEqual('single');
     expect(pipe.transform('dance-threepanel')).toEqual('threepanel');
   });
 });

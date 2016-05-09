@@ -12,7 +12,6 @@ export class FormatStepstypePipe implements PipeTransform {
     } else {
       let parts = value.split('-');
       let formatted = parts[1];
-      formatted += parts[0] == 'dance' ? '' : ' (' + parts[0] + ')';
       return formatted;
     }
   }
