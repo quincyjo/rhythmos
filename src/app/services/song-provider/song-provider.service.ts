@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Song} from '../../shared/index';
+import {Song, SongChart} from '../../shared/classes/index';
 import {SongsModel} from '../../models/index';
 
 
@@ -8,8 +8,8 @@ export class SongProvider {
 
   constructor(private _model: SongsModel) {}
 
-  public getSongs() {
-    let promise = new Promise<any>((resolve, reject) => {
+  public getSongs(): Promise<Array<Song>> {
+    let promise = new Promise<Array<Song>>((resolve, reject) => {
       this._model.getSongs().then((songs) => {
         resolve(songs);
       });
@@ -17,7 +17,7 @@ export class SongProvider {
     return promise;
   }
 
-  public getById(id: any): Promise<any> {
+  public getById(id: any): Promise<Song> {
     let promise = new Promise<any>((resolve, reject) => {
       this._model.getSongByKey(id).then((song) => {
         resolve(song);
@@ -57,6 +57,17 @@ export class SongProvider {
         resolve(music);
       }, (error) => {
         console.log(error);
+      });
+    });
+    return promise;
+  }
+
+  public getNotes(song: Song, chart: SongChart): Promise<any> {
+    let promise = new Promise<SongChart>((resolve, reject) => {
+      this._model.getNotes(song.id, chart.stepstype, chart.difficulty).then((notes) => {
+        resolve(notes);
+      }, (error) => {
+        console.log('Provider faild to get chart notes from model: ', error);
       });
     });
     return promise;

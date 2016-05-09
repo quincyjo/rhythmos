@@ -59,31 +59,51 @@ h2.song-title {
 
 .chart-select {
   height: 50px;
-  width: 55px;
-  background-color: #9856d6;
+  width: 75px;
   color: #fff;
   position: relative;
-  padding-left: 20px;
+  margin-bottom: 5px;
 }
 
-.chart-select .rating {
+.chart-select.Beginner {
+  background-color: hsl(192, 100%, 45%);
+}
+
+.chart-select.Easy {
+  background-color: hsl(135, 79%, 47%);
+}
+
+.chart-select.Medium {
+  background-color: rgb(233, 196, 35);
+}
+
+.chart-select.Hard {
+  background-color: rgb(171, 22, 22);
+}
+
+.chart-select.Challenge {
+  background-color: rgb(132, 26, 158);
+}
+
+.chart-select.Edit {
+  background-color: rgb(23, 23, 43);
+}
+
+.chart-select .meter {
   width: 75px;
   text-align: center;
   font-size: 50px;
 }
 
 .chart-select .difficulty {
-  position: absolute;
-  top: 0;
-  left: 20px;
-  transform: rotate(90deg);
-	transform-origin: left top 0;
-  float: left;
   text-transform: uppercase;
   height:20px;
   width: 50px;
-  background: rgba(0, 0, 0, 0.25);
   padding: 0;
   margin: 0;
   text-align: center;
+}
+
+.chart-select .stepstype {
+
 }

@@ -2,7 +2,7 @@
 
 }import {Component, HostListener} from '@angular/core';
 import {ROUTER_DIRECTIVES, RouteTree, Router, OnActivate, RouteSegment} from '@angular/router';
-import {Song} from '../../shared/index';
+import {Song} from '../../shared/classes/index';
 import {SongDetail} from '../../components/index';
 import {SongProvider} from '../../services/index';
 
@@ -16,7 +16,7 @@ import {SongProvider} from '../../services/index';
 })
 export class SongWheel {
   public title = 'Songs';
-  public songs: Song[];
+  public songs: Array<Song>;
   public selectedSong: Song;
   public activeIndex: number;
   public bgs: Array<any>;
@@ -25,6 +25,7 @@ export class SongWheel {
 
   constructor(private _songProvider: SongProvider,
               private _router: Router) {
+                this.songs = [];
                 this.bgs = [];
                 this.audio = new Audio;
               }
@@ -32,7 +33,9 @@ export class SongWheel {
   ngOnInit() {
     this._songProvider.getSongs().then(songs => {
       this.songs = songs;
-      this.select(0);
+      if (songs.length > 0) {
+        this.select(0);
+      }
     });
   }
 
@@ -66,46 +69,49 @@ export class SongWheel {
     }
     if (this.songs && this.songs[this.activeIndex]) {
       let song = this.songs[this.activeIndex];
-      if (song.music === true) { // Resolve binary blob
+      if (song.getData().music === true) { // Resolve binary blob
         this._songProvider.getMusic(song).then((music) => {
-          this._playSample(music, song.samplestart, song.samplelength);
+          this._playSample(music, song.getMeta().samplestart, song.getMeta().samplelength);
         });
-      } else if (song.music) { // Already resolved, use dataUrl
-        this._playSample(song.music, song.samplestart, song.samplelength);
+      } else if (song.getData().music) { // Already resolved, use dataUrl
+        this._playSample(song.getData().music, song.getMeta().samplestart, song.getMeta().samplelength);
       }
     }
   }
 
+  private _audioListener: (e: Event) => void;
   private _playSample(music: any, start: number, length: number) {
     if (!this.audio.paused) {
       this.audio.pause();
     }
     this.audio.src = music;
     this.audio.currentTime = start;
-    this.audio.addEventListener('timeupdate', (event) => {
-      if (this.audio.currentTime > start + start + length) {
+    console.log(start, length);
+    this.audio.removeEventListener('timeupdate', this._audioListener, false);
+    this._audioListener = (event) => {
+      if (this.audio.currentTime > start + length) {
         this.audio.currentTime = start;
       }
-    }, false);
+    };
+    this.audio.addEventListener('timeupdate', this._audioListener, false);
     this.audio.play();
   }
 
   public fetchBackground() {
     let bg: any;
-    if (this.songs
-    && this.songs[this.activeIndex]) {
+    if (this.songs[this.activeIndex]) {
       let song = this.songs[this.activeIndex];
-      if (song.background === true) {
+      if (song.getData().background === true) {
         this._songProvider.getBackground(song).then((background) => {
           bg = `
             radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
-            url("` + song.background + '") 50% 50% / cover no-repeat';
+            url("` + song.getData().background + '") 50% 50% / cover no-repeat';
           this._pushBg(bg);
         });
       } else {
         bg = `
           radial-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.8)),
-            url("` + song.background + '") 50% 50% / cover no-repeat';
+            url("` + song.getData().background + '") 50% 50% / cover no-repeat';
         this._pushBg(bg);
       }
     } else {
@@ -133,7 +139,7 @@ export class SongWheel {
     return (this.activeIndex === index);
   }
 
-  public getSelected(): Song {
+  public getSelected(): Object {
     if (this.songs) {
       return this.songs[this.activeIndex];
     } else {
@@ -157,7 +163,7 @@ export class SongWheel {
   }
 
   public play(id: number) {
-    this._router.navigate(['/song-wheel', id]);
+    this._router.navigate(['/song-wheel', id, 0]);
   }
 
   private _keyEnter() {

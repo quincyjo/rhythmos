@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {SongProvider} from '../../services/index';
-import {Song} from '../../shared/index';
+import {Song} from '../../shared/classes/index';
 
 @Component({
   selector: 'song-detail',
@@ -19,14 +19,13 @@ export class SongDetail {
   ngOnInit() {}
 
   public fetchBanner() {
-    if (this.song.banner === true) {
+    if (this.song.getData().banner === true) {
       this._songProvider.getBanner(this.song).then((banner) => {
-        this.song.banner = banner;
-        let url = this.song.banner;
+        let url = banner;
         return 'url("' + url + '") 50% 50% / cover no-repeat';
       });
-    } else if (this.song.banner) {
-      let url = this.song.banner;
+    } else if (this.song.getData().banner) {
+      let url = this.song.getData().banner;
       return 'url("' + url + '") 50% 50% / cover no-repeat';
     } else {
       return '#000';

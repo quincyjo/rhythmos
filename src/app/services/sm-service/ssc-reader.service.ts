@@ -4,21 +4,19 @@ import {StepsType, NoteType, STEPSCOLUMNS, DifficultyType} from '../../shared/ty
 import {SMUTILS} from './utils';
 
 
-let chartBuilder: ChartBuilder;
-let factory: SscFactory;
-
-
 @Injectable()
 export class SscReader {
+  private chartBuilder: ChartBuilder;
+  private factory: SscFactory;
 
   constructor() {
-    chartBuilder = new ChartBuilder();
-    factory = new SscFactory();
+    this.chartBuilder = new ChartBuilder();
+    this.factory = new SscFactory();
   }
 
   public readFromUrl(url: string): Promise<Ssc> {
     let promise = new Promise<Ssc>((resolve, reject) => {
-      let ssc = factory.makeSsc();
+      let ssc = this.factory.makeSsc();
       SMUTILS.getTextFromUrl(url).then((value) => {
         let text = SMUTILS.stripFile(value);
         let split = SMUTILS.splitTags(text);
@@ -32,7 +30,7 @@ export class SscReader {
           if (tag != 'notedata') {
             ssc[tag] = SMUTILS.parseValue(tag, value);
           } else {
-            ssc.notedata.push(chartBuilder.buildChart(split, i));
+            ssc.notedata.push(this.chartBuilder.buildChart(split, i));
           }
         }
         resolve (ssc);
@@ -43,7 +41,7 @@ export class SscReader {
 }
 
 
-export class SscFactory {
+class SscFactory {
 
   constructor() {}
 
@@ -67,13 +65,16 @@ export class SscFactory {
 }
 
 
-export class ChartBuilder {
+class ChartBuilder {
+  private factory: SscFactory;
   public chart: SscChart;
 
-  constructor() {}
+  constructor() {
+    this.factory = new SscFactory();
+  }
 
   public buildChart(tags: Array<Array<string>>, index: number): SscChart {
-    this.chart = factory.makeChart();
+    this.chart = this.factory.makeChart();
     let i = index + 1;
     while (tags[i] && tags[i][0] != 'notedata') {
       let tag = tags[i][0];

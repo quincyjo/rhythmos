@@ -1,4 +1,4 @@
 export {MainMenu} from './main-menu/main-menu.component';
-export {SongChart} from './song-chart/song-chart.component';
+export {SongStage} from './song-stage/song-stage.component';
 export {SongDetail} from './song-detail/song-detail.component';
 export {SongWheel} from './song-wheel/song-wheel.component';

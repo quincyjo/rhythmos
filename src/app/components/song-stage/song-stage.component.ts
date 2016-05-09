@@ -1,6 +1,7 @@
 import {Component, HostListener, Input} from '@angular/core';
-import {OnActivate, Router, RouteSegment} from '@angular/router';
-import {Song} from '../../shared/index';
+import {CanDeactivate, OnActivate, Router, RouteSegment} from '@angular/router';
+import {NoteType, StepsType, STEPSCOLUMNS} from '../../shared/types/index';
+import {Song, SongChart} from '../../shared/classes/index';
 import {SongProvider} from '../../services/index';
 
 let arrow: any;
@@ -18,15 +19,19 @@ let start: number;
 let measureOffset: number;
 
 @Component({
-  selector: 'song-chart',
-  templateUrl: 'app/components/song-chart/song-chart.component.html',
-  styleUrls: ['app/components/song-chart/song-chart.component.html'],
+  selector: 'song-stage',
+  templateUrl: 'app/components/song-stage/song-stage.component.html',
+  styleUrls: ['app/components/song-stage/song-stage.component.html'],
   providers: [SongProvider],
   directives: [],
   pipes: []
 })
-export class SongChart {
-    @Input() song: Song;
+export class SongStage {
+    song: Song;
+    notes: Array<Array<Array<NoteType>>>;
+    chart: SongChart;
+    songid: number;
+    chartindex: number
     private _canvas: HTMLCanvasElement;
     private _keys: number[];
     private _tracks: Track[];
@@ -42,29 +47,37 @@ export class SongChart {
     ) {}
 
   routerOnActivate(curr: RouteSegment) {
-    let id = +curr.getParam('id');
+    this.songid = +curr.getParam('id');
+    this.chartindex = +curr.getParam('chart');
+  }
+
+  ngOnInit() {
     factory = new StepFactory();
     scoreBoard = new ScoreBoard();
-    this._keys = [0, 0, 0, 0];
     this._canvas = <HTMLCanvasElement>document.getElementById('chart');
     this._canvas.width = window.innerWidth;
     this._canvas.height = window.innerHeight;
-    this._songProvider.getById(id).then((song) => { // Get song
+    this._songProvider.getById(this.songid).then((song) => { // Get song
       this.song = song;
-      measureStep = (1 / (this.song.bpms[0] / 60) * 4000);
-      measureOffset = Math.ceil(2000 / measureStep);
-      this._loadAssets().then(() => {               // Preload assets
-        this._buildStage().then(() => {             // Create stage objects
-          this._prerenderMeasures();                // Prerender measures
-          this._fadeIn(1000).then(() => {           // Fade in
-            setTimeout(this.start(), 1000);         // Start song
+      this.chart = this.song.getCharts()[this.chartindex];
+      this._songProvider.getNotes(this.song, this.chart).then((notes) => { // Get Chart
+        this.notes = notes;
+        factory.offset = -this.chart.offset * 1000;
+        // Create the keys array with length of the stepcolumns for the stepstype and fill with 0
+        this._keys = Array(STEPSCOLUMNS[this.chart.stepstype]).fill(0);
+        measureStep = (1 / (this.chart.bpms[0].value / 60) * 4000);
+        measureOffset = Math.ceil(2000 / measureStep);
+        this._loadAssets().then(() => {               // Preload assets
+          this._buildStage().then(() => {             // Create stage objects
+            this._prerenderMeasures();                // Prerender measures
+            this._fadeIn(1000).then(() => {           // Fade in
+              setTimeout(this.start(), 1000);         // Start song
+            });
           });
         });
       });
     });
   }
-
-  ngOnInit() {}
 
   public start() {
     this._continue = true;
@@ -146,18 +159,18 @@ export class SongChart {
 
   private _updateMeasure() {
     let index = Math.floor(this._runningTime / measureStep) + measureOffset;
-    if (index != lastMeasureIndex && index < this.song.notes.notes.length) {
+    if (index != lastMeasureIndex && index < this.notes.length) {
       lastMeasureIndex = index;
       this._loadMeasure(index);
     }
   }
 
   private _loadMeasure(index: number) {
-      measure = this.song.notes.notes[index];
+      measure = this.notes[index];
       for (let i = 0; i < measure.length; i++) {
         let line = measure[i];
         for (let j = 0; j < line.length; j++) {
-          if (line[j] == 1 || line[j] == 2) {
+          if (line[j] == '1' || line[j] == '2') {
             this._tracks[j].steps.push(
               factory.createStep(i, measure.length)
             );
@@ -252,7 +265,7 @@ export class SongChart {
         glow.src = 'assets/glow.png';
       }));
       promises.push(new Promise<any>((resolve, reject) => {
-        if (this.song.background === false) {
+        if (this.song.getData().background === false) {
           bg = false;
           resolve();
         } else {
@@ -260,12 +273,12 @@ export class SongChart {
           bg.onload = () => {
             resolve();
           };
-          if (this.song.background === true) {
+          if (this.song.getData().background === true) {
             this._songProvider.getBackground(this.song).then((background) => {
               bg.src = background;
             });
           } else {
-            bg.src = this.song.background;
+            bg.src = this.song.getData().background;
           }
         }
       }));
@@ -315,6 +328,12 @@ export class SongChart {
     this._canvas.getContext('2d').drawImage(bg, 0, 0, bg.width, bg.height,
                                             0, 0, this._canvas.width, this._canvas.height);
     }
+  }
+
+  routerCanDeactivate() {
+    audio.pause();
+    this._continue = false;
+    return true;
   }
 }
 
@@ -411,6 +430,8 @@ interface Step {
 }
 
 class StepFactory {
+  offset: number;
+
   constructor() {}
 
   public createStep(beat: number, time: number): Step {
@@ -477,7 +498,7 @@ class StepFactory {
       sheight: 128,
       x: 0,
       y: 0,
-      target: start + (lastMeasureIndex + (beat / time)) * measureStep,
+      target: this.offset + start + (lastMeasureIndex + (beat / time)) * measureStep,
       measure: lastMeasureIndex,
       beat: beat,
       time: time,

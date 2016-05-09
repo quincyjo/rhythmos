@@ -6,6 +6,7 @@ import {SongData} from './song-data.class';
 import {SongChart} from './song-chart.class';
 
 export class Song {
+  public id: number;
   private metadata: SongMetadata;
   private data: SongData;
   private charts: Array<SongChart>;
@@ -19,20 +20,20 @@ export class Song {
     }
   }
 
-  public getMeta(): SongMetadata {
-    return this.metadata;
+  public getMeta(key?: string) {
+    return key ? this.metadata[key] : this.metadata;
   }
 
-  public getData(): SongData {
-    return this.data;
+  public getData(key?: string) {
+    return key ? this.data[key] : this.data;
   }
 
-  public getCharts(): Array<SongChart> {
-    return this.charts;
+  public getCharts(key?: string) {
+    return key ? this.charts[key] : this.charts;
   }
 
-  public getOther(): Object {
-    return this.other;
+  public getOther(key? : string) {
+    return key ? this.other[key] : this.other;
   }
 
   /**
@@ -40,6 +41,9 @@ export class Song {
    * @param  {Object}    song The song, any object.
    */
   private _load(song: Object) {
+    if (song['id']) {
+      this.id = song['id'];
+    }
     this._loadMetadata(song);
     this._loadData(song);
     this._loadCharts(song);
@@ -51,7 +55,11 @@ export class Song {
    * @param  {Object}    song The song, any object.
    */
   private _loadMetadata(song: Object) {
-    this.metadata = new SongMetadata(song);
+    if (song['metadata']) {
+      this.metadata = new SongMetadata(song['metadata']);
+    } else {
+      this.metadata = new SongMetadata(song);
+    }
   }
 
   /**
@@ -59,7 +67,11 @@ export class Song {
    * @param  {Object}    song The song, any object.
    */
   private _loadData(song: Object) {
-    this.data = new SongData(song);
+    if (song['data']) {
+      this.data = new SongData(song['data']);
+    } else {
+      this.data = new SongData(song);
+    }
   }
 
   /**
@@ -69,15 +81,21 @@ export class Song {
    * @param  {Object} song The song, any object.
    */
   private _loadCharts(song: Object) {
-    song['notedata'].forEach((notedata) => {
-      let chart = new SongChart(notedata);
-      for (let key in chart) {
-        if (chart[key] == null && (song[key] || song[key] === 0)) {
-          chart[key] = song[key];
+    if (song['charts']) {
+      song['charts'].forEach((chart) => {
+        this.charts.push(new SongChart(chart));
+      });
+    } else {
+      song['notedata'].forEach((chart) => {
+        let paddedChart = new SongChart(chart);
+        for (let key in paddedChart) {
+          if (paddedChart[key] == null && (song[key] || song[key] === 0)) {
+            paddedChart[key] = song[key];
+          }
         }
-      }
-      this.charts.push(chart);
-    });
+        this.charts.push(paddedChart);
+      });
+    }
   }
 
   /**
@@ -85,12 +103,16 @@ export class Song {
    * @param  {Object}    song The song, any object.
    */
   private _loadOther(song: Object) {
-    for (let key in song) {
-      if (key != 'notedata'
-       && this.data[key] === undefined
-       && this.metadata[key] === undefined) {
-         this.other[key] = song[key];
-       }
+    if (song['other']) {
+      this.other = song['other'];
+    } else {
+      for (let key in song) {
+        if (key != 'notedata'
+         && this.data[key] === undefined
+         && this.metadata[key] === undefined) {
+           this.other[key] = song[key];
+         }
+      }
     }
   }
 }

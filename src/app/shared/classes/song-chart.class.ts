@@ -1,5 +1,7 @@
 import {StepsType, DifficultyType, NoteType} from '../types/index';
 
+type NoteReference = Array<Array<Array<NoteType>>> | boolean;
+
 export class SongChart {
   chartname: string = '';
   stepstype: StepsType = 'dance-single';
@@ -10,7 +12,7 @@ export class SongChart {
   radarvalues: Array<number> = [];
   credit: string = '';
   offset: number = 0;
-  bpms: Array<{beat: number, bpm: number}> = [];
+  bpms: Array<{beat: number, value: number}> = [];
   stops: Array<Object> = [];
   delays: Array<Object> = [];
   warps: Array<Object> = [];
@@ -22,11 +24,18 @@ export class SongChart {
   fakes: Object = {};
   labels: Object = {};
   displaybpm: string = '';
-  notes: Array<Array<Array<NoteType>>> = [];
+  notes: NoteReference = [];
 
   constructor(song?: Object) {
     for (let key in this) {
-      this[key] = song && song[key] || null;
+      this[key] = song && this.reduce(song[key]) || null;
     }
+  }
+
+  reduce(value: any) {
+    if(!value || (Array.isArray(value) && !value.length)) {
+      return false
+    }
+    return value;
   }
 }

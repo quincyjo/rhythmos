@@ -1,7 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Song} from '../shared/index';
-import {DatabaseService} from '../services/index';
+import {StepsType, DifficultyType} from '../shared/types/index';
+import {Song, SongData, SongMetadata, SongChart} from '../shared/classes/index';
+import {DatabaseService, SscReader, SmReader} from '../services/index';
 import {SONGS} from './mock-songs';
+
 
 /**
  * Entry point for songs storage. Exposes the objectStores in context of the app, and resolves
@@ -11,12 +13,10 @@ import {SONGS} from './mock-songs';
 @Injectable()
 export class SongsModel {
   private _songs: Array<Song>;
-  private _blobs: Array<any>;
   private _objectUrls: Array<any>;
+  private _sscReader: SscReader = new SscReader();
 
   constructor(private _database: DatabaseService) {
-    this._songs = [];
-    this._blobs = [];
     this._objectUrls = [];
   }
 
@@ -24,11 +24,15 @@ export class SongsModel {
    * Fetchs all songs and returns them. Does not resolve references.
    * @return {Promise<any>} Resolves to the array of songs.
    */
-  public getSongs(): Promise<any> {
+  public getSongs(): Promise<Array<Song>> {
     let promise = new Promise<any>((resolve, reject) => {
-      this._fetchSongs().then(() => {
+      if (this._songs) {
         resolve(this._songs);
-      });
+      } else {
+        this._fetchSongsFromDatabase().then(() => {
+          resolve(this._songs);
+        });
+      }
     });
     return promise;
   }
@@ -39,7 +43,7 @@ export class SongsModel {
    * @return {Promise<any>}     Resolves to the requested song. Logs error on failure. Does not
    *                            reject.
    */
-  public getSongByKey(key: any): Promise<any> {
+  public getSongByKey(key: any): Promise<Song> {
     let promise = new Promise<any>((resolve, reject) => {
       // Check cached songs
       let local = this._songs.find(
@@ -57,6 +61,8 @@ export class SongsModel {
               this._songs.push(song);
               resolve(song);
             });
+          }, (error) => {
+            console.log("Failed to initiate database: ", error);
           });
         });
       }
@@ -74,26 +80,37 @@ export class SongsModel {
   public getObjectUrl(key: any, name: any): Promise<any> {
     let promise = new Promise((resolve, reject) => {
       // Check cached object urls
-      let local = this._objectUrls.find( (url) => {
+      let local = this._objectUrls.find((url) => {
         return (url.id === key && url.name === name);
       });
       if (local) {
         resolve(local);
-      }
-      // Not store, query DB
-      this._getBlob(key, name).then((blob) => {
-        // Create data url
-        let URL = window.URL;
-        let dataUrl = URL.createObjectURL(blob.blob);
-        // Store to be retired
-        this._objectUrls.push(dataUrl);
-        this.getSongByKey(key).then((song) => {
-          song[name] = dataUrl;
+      } else { // Not store, query DB
+        this._getBlob(key, name).then((blob) => {
+          // Create data url
+          let URL = window.URL;
+          let dataUrl = URL.createObjectURL(blob.blob);
+          // Store to be retired
+          this._objectUrls.push(dataUrl);
+          this.getSongByKey(key).then((song) => {
+            song.getData()[name] = dataUrl;
+          });
+          // Ensure the song is loaded and resolve the link
+          resolve(dataUrl);
+        }, (error) => {
+          console.log(error);
         });
-        // Ensure the song is loaded and resolve the link
-        resolve(dataUrl);
+      }
+    });
+    return promise;
+  }
+
+  public getNotes(key: any, stepstype: StepsType, difficulty: DifficultyType): Promise<any> {
+    let promise = new Promise((resolve, reject) => {
+      this._database.getByKey('songCharts', [key, stepstype, difficulty]).then((chart) => {
+        resolve(chart.notes);
       }, (error) => {
-        console.log(error);
+        console.log('Filed to get chart: ', error);
       });
     });
     return promise;
@@ -104,29 +121,45 @@ export class SongsModel {
    * @param  {any}          song Song to be stored.
    * @return {Promise<any>}      Resolves on success, logs error on failure. Does not reject.
    */
-  public addSong(song: any): Promise<any> {
+  public addSong(song: Song, root?: string): Promise<any> {
+    // Currently convoluted due to TS not probably evaluating types of resolved values from
+    // Promise.all.
     let promise = new Promise<any>((resolve, reject) => {
-      // Resolve and detatch blobs from song
-      this._fetchBlobs(song).then((blobs) => {
-        // Add song to song objectStore and get key to bind blobs
+      let dblobs, dcharts;
+      let promises: Array<Promise<any>> = [];
+      // Push a promise to detatch blobs
+      promises.push(new Promise<any>((resolve, reject) => {
+        this._detatchBlobs(song.getData(), root).then((blobs) => {
+          dblobs = blobs;
+          resolve();
+        });
+      }));
+      // Push a promise to detatch charts
+      promises.push(new Promise<any>((resolve, reject) => {
+        this._detatchCharts(song).then((charts) => {
+          dcharts = charts;
+          resolve();
+        });
+      }));
+      Promise.all(promises).then((values) => {
+        // Done detatching expensive resources, add striped song to DB
         this._database.add('songs', song).then((keypair) => {
-          // Add all resolved blobs to blob objectStore
-          let promises: Promise<any>[] = [];
-          for (let blob of blobs) {
+          let promises: Array<Promise<any>> = [];
+          // Add the detatched blobs to the blobs db
+          for (let blob of dblobs) {
             if (blob) {
-              promises.push(this._addBlob(blob.value, keypair.key, blob.key));
+              promises.push(this._addBlob(blob.value, keypair.key, blob.key))
             }
           }
-          Promise.all(promises).then((values) => {
-            resolve();
-          }, (error) => {
-            console.log(error);
-          });
-        }, (error) => {
-          console.log(error);
+          // Add the detatched charts to the chart db
+          for (let chart of dcharts) {
+            if (chart) {
+              promises.push(this._addChart(chart.value, keypair.key, chart.stepstype, chart.difficulty));
+            }
+          }
+          // Striped song and detatched assets stored, resolve to completion
+          Promise.all(promises).then(() => {resolve();});
         });
-      }, (error) => {
-        console.log(error);
       });
     });
     return promise;
@@ -142,16 +175,7 @@ export class SongsModel {
    */
   private _getBlob(key: any, name: any): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      // Check cached songs
-      let local = this._blobs.find(
-        (blob) => {
-          return (blob.id === key && blob.name === name);
-        }
-      );
-      if (local) { resolve(local); }
-      // Not stored, query DB
       this._database.getByKey('songBlobs', [key, name]).then((blob) => {
-        this._blobs.push(blob);
         resolve(blob);
       }, (error) => {
         console.log('Failed to fetch blob: ', error);
@@ -177,8 +201,24 @@ export class SongsModel {
       }).then((keypair) => {
         resolve(keypair);
       }, (error) => {
-        console.log(error);
+        console.log('Failed to add blob to database: ', error);
       });
+    });
+    return promise;
+  }
+
+  private _addChart(notes: any, id: any, stepstype: StepsType, difficulty: DifficultyType) {
+    let promise = new Promise((resolve, reject) => {
+      this._database.add('songCharts', {
+        id: id,
+        stepstype: stepstype,
+        difficulty: difficulty,
+        notes: notes
+      }).then((keypair) => {
+        resolve(keypair);
+      }, (error) => {
+        console.log('Failed to add chart to database: ', error);
+      })
     });
     return promise;
   }
@@ -189,34 +229,28 @@ export class SongsModel {
    */
   private _init(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-    this._database.deleteDB().then(() => {
+    //this._database.deleteDB().then(() => {
       let fill: boolean = false;
       this._database.createStore(1, (event) => { // Create objectStore
-        console.log('Creating songs');
+        // Song store
         let objectStore = event.currentTarget.result.createObjectStore(
           'songs', {keyPath: 'id', autoIncrement: true});
-        objectStore.createIndex('title', 'title', {unique: false});
-        objectStore.createIndex('subtitle', 'subtitle', {unique: false});
-        objectStore.createIndex('artist', 'artist', {unique: false});
-        objectStore.createIndex('genre', 'genre', {unique: false});
-        objectStore.createIndex('credit', 'credit', {unique: false});
-        objectStore.createIndex('banner', 'banner', {unique: false});
-        objectStore.createIndex('background', 'background', {unique: false});
-        objectStore.createIndex('cdtitle', 'cdtitle', {unique: false});
-        objectStore.createIndex('music', 'music', {unique: false});
-        objectStore.createIndex('offset', 'offset', {unique: false});
-        objectStore.createIndex('bpms', 'bpms', {unique: false});
-        objectStore.createIndex('stops', 'stops', {unique: false});
-        objectStore.createIndex('samplestart', 'samplestart', {unique: false});
-        objectStore.createIndex('samplelength', 'samplelength', {unique: false});
-        objectStore.createIndex('displaybpm', 'displaybpm', {unique: false});
-        objectStore.createIndex('selectable', 'selectable', {unique: false});
-        objectStore.createIndex('notes', 'notes', {unique: false});
+        objectStore.createIndex('metadata', 'metedata', {unique: false});
+        objectStore.createIndex('data', 'data', {unique: false});
+        objectStore.createIndex('charts', 'charts', {unique: false});
+        objectStore.createIndex('other', 'other', {unique: false});
+        // Blob store
         let blobStore = event.currentTarget.result.createObjectStore(
           'songBlobs', {keyPath: ['id', 'name']});
         blobStore.createIndex('blob', 'blob', {unique: false});
+        // Chart store
+        let chartStore = event.currentTarget.result.createObjectStore(
+          'songCharts', {keyPath: ['id', 'stepstype', 'difficulty']}
+        );
+        chartStore.createIndex('notes', 'notes', {unique: false});
         fill = true;
       }).then( () => { // Resolve
+        this._songs = [];
         if (fill) { // If initiated, fill with moch data
           this._fillMockData().then(() => {
             resolve();
@@ -228,18 +262,83 @@ export class SongsModel {
         reject(error);
       });
     });
-    });
+    //});
     return promise;
   }
 
   private _fillMockData(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       let promises: Promise<any>[] = [];
-      for (let song of SONGS) {
-        promises.push(this.addSong(song));
+      let urls = [
+        'https://raw.githubusercontent.com/stepmania/stepmania/master/Songs/StepMania%205/Goin\'%20Under/Goin\'%20Under.ssc',
+        'https://raw.githubusercontent.com/stepmania/stepmania/master/Songs/StepMania%205/MechaTribe%20Assault/Mecha-Tribe%20Assault.ssc',
+        'https://raw.githubusercontent.com/stepmania/stepmania/master/Songs/StepMania%205/Springtime/Springtime.ssc'
+      ];
+      for (let url of urls) {
+        promises.push(new Promise<any>((resolve, reject) => {
+          let root;
+          if (url.lastIndexOf('/') > -1) {
+            root = url.substr(0, url.lastIndexOf('/') + 1);
+          }
+          this._sscReader.readFromUrl(url).then((ssc) => {
+            let song = new Song(ssc);
+            console.log(ssc, song);
+            this.addSong(song, root).then(() => {
+              resolve();
+            });
+          });
+        }));
       }
       Promise.all(promises).then(() => {
         resolve();
+      }, (error) => {
+        console.log(error);
+      });
+    });
+    return promise;
+  }
+
+  /**
+   * Detatched the chart notes for the given chart and detatches it from
+   * chart, setting the attribut to false or true whether or not the chart
+   * was resolved.
+   * @param  {SongChart}         chart The chart to fetch the notes from.
+   * @return {Promise<any>}      Resolved to the blob if able, resolves to
+   *                             void if no notes, and reject if invalid
+   *                             attribute.
+   */
+  private _detatchChart(chart: SongChart): Promise<any> {
+    let promise = new Promise<any>((resolve, reject) => {
+      if (chart.notes) {
+        resolve({
+          stepstype: chart.stepstype,
+          difficulty: chart.difficulty,
+          value: chart.notes
+        });
+        chart.notes = true;
+      } else {
+        chart.notes = false;
+        resolve(false);
+      }
+    });
+    return promise;
+  }
+
+  /**
+   * Detatches notes for all charts in the given song and resolves to an array
+   * of the notes with steptstype, difficultye, and value, the attributes needed
+   * to store the chart into the chart objectStore.
+   * @param  {Song}         song The song to detatch the nots from.
+   * @return {Promise<any>}      Resolves to an array of objects with notes and key values.
+   */
+  private _detatchCharts(song: Song): Promise<any> {
+    let promise = new Promise<any>((resolve, reject) => {
+      let promises: Promise<any>[] = [];
+      for (let chart of song.getCharts()) {
+        promises.push(this._detatchChart(chart));
+      }
+      Promise.all(promises).then((charts) => {
+        resolve(charts);
       }, (error) => {
         console.log(error);
       });
@@ -257,12 +356,13 @@ export class SongsModel {
    *                             void if no blob, and reject if invalid
    *                             attribute. Logs error on XHR failure.
    */
-  private _fetchBlob(song: any, name: string): Promise<any> {
+  private _detatchBlob(data: SongData, name: string, root?: string): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
-      if (song[name]) {
-        this.getBlobFromUrl(song[name]).then((blob) => {
-          let path = song[name];
-          song[name] = true;
+      if (data[name]) {
+        // TODO: generate path relatively if remote file
+        let path = root ? root + data[name] : data[name];
+        this.getBlobFromUrl(path).then((blob) => {
+          data[name] = true;
           resolve({
             key: name,
             value: blob,
@@ -272,7 +372,7 @@ export class SongsModel {
           console.log(error);
         });
       } else {
-        song[name] = false;
+        data[name] = false;
         resolve(false);
       }
     });
@@ -286,12 +386,11 @@ export class SongsModel {
    * @return {Promise<any>}      Resolved to array of blobs or logs error on
    *                             failure.
    */
-  private _fetchBlobs(song: any): Promise<any> {
+  private _detatchBlobs(data: SongData, root?: string): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       let promises: Promise<any>[] = [];
-      let names = ['banner', 'background', 'music'];
-      for (let name of names) {
-        promises.push(this._fetchBlob(song, name));
+      for (let key in data) {
+        promises.push(this._detatchBlob(data, key, root));
       }
       Promise.all(promises).then( (blobs) => {
         resolve(blobs);
@@ -302,17 +401,26 @@ export class SongsModel {
     return promise;
   }
 
-  private _fetchSongs(): Promise<any> {
+  private _fetchSongsFromDatabase(): Promise<any> {
     let promise = new Promise<any>((resolve, reject) => {
       this._database.getAll('songs').then(
         (songs) => {
-          this._songs = songs;
+          songs.forEach((song) => {
+            // If the songs in not in already cached songs, add it
+            if (!this._songs.find((elem) => {
+              return (elem.id === song.id);
+            })) {
+              this._songs.push(new Song(song));
+            }
+          })
           resolve();
         }, (error) => {
           this._init().then(() => {
-            this._fetchSongs().then(() => {
+            this._fetchSongsFromDatabase().then(() => {
               resolve();
             });
+          }, (error) => {
+            console.log('Failed to initiate database', error);
           });
         }
       );

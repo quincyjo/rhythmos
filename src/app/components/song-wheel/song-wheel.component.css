@@ -69,7 +69,7 @@
 .wheel {
   padding: 0;
   margin: 0;
-  flex: 0 1 50%;
+  flex: 0 1 40%;
   border-left: 5px solid #fff;
   max-width: 500px;
   background: rgba(50,50,50,0.75);
@@ -78,7 +78,7 @@
 }
 
 .song-detail {
-  flex: 0 1 50%;
+  flex: 0 1 60%;
   max-width: 600px;
   margin: 25px auto;
 }

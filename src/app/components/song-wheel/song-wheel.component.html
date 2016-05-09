@@ -22,9 +22,9 @@
           (mouseenter)="select(i)"
           (click)="play(song.id)"
           [ngClass]="{'selected': isSelected(i)}">
-          <h2 class="song-title">{{song.title}}</h2>
-          <h3 class="song-subtitle">{{song.subtitle}}</h3>
-          <h4 class="song-artist">~{{song.artist}}</h4>
+          <h2 class="song-title">{{song.getMeta().title}}</h2>
+          <h3 class="song-subtitle">{{song.getMeta().subtitle}}</h3>
+          <h4 class="song-artist">~{{song.getMeta().artist}}</h4>
         </li>
       </ul>
     </div>

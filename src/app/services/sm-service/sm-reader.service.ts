@@ -45,7 +45,7 @@ export class SmReader {
 }
 
 
-export class SmFactory {
+class SmFactory {
 
   constructor() {}
 
@@ -64,7 +64,7 @@ export class SmFactory {
 }
 
 
-export class ChartBuilder {
+class ChartBuilder {
   public chart: SmChart;
 
   constructor() {}

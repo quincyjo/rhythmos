@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {Router, RouteSegment, OnActivate, Routes, ROUTER_DIRECTIVES} from '@angular/router';
 
-import {SongWheel, SongChart} from '../../components/index';
+import {SongWheel, SongStage} from '../../components/index';
 
 @Component({
   template: '<router-outlet></router-outlet>',
@@ -10,7 +10,7 @@ import {SongWheel, SongChart} from '../../components/index';
 })
 @Routes([
   {path:'', component: SongWheel},
-  {path:'/:id', component: SongChart}
+  {path:'/:id/:chart', component: SongStage}
 ])
 export class SongWheelRoot {
   constructor(private _router: Router) {}

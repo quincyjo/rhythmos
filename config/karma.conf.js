@@ -30,7 +30,8 @@ module.exports = function (config) {
     ],
     exclude: [
       // Vendor packages might include spec files. We don't want to use those.
-      'dist/vendor/**/*.spec.js'
+      'dist/vendor/**/*.spec.js',
+      'dist/songs/**/*'
     ],
     preprocessors: {
       '**/*.html': ['ng-html2js']
@@ -43,7 +44,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
     singleRun: false
   });
 };

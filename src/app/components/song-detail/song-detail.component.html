@@ -3,22 +3,23 @@
     <div class="banner" [ngStyle]="{
       'background': fetchBanner()
       }">
-      <h2 class="song-title">{{song.title}}</h2>
+      <h2 class="song-title">{{song.getMeta().title}}</h2>
     </div>
     <div class="chart-container">
-      <div class="chart-select">
-        <span class="rating">
-        {{song.notes.rating}}
+      <div class="chart-select {{chart.difficulty}}"
+        *ngFor="let chart of song.getCharts()">
+        <span class="difficulty">
+          {{chart.difficulty}}
+          {{chart.meter}}
         </span>
-          <span class="difficulty">
-            {{song.notes.difficulty}}
-          </span>
+        <span class="stepstype">
+          {{chart.stepstype}}
+        </span>
       </div>
     </div>
   </div>
-  <h3>{{song.subtitle}}</h3>
-  <h3>{{song.artist}}</h3>
-  <h4>{{song.cdtitle}}</h4>
-  <h4>{{song.genre}}</h4>
-  <h3>{{song.bpm}}</h3>
+  <h3>{{song.getMeta().subtitle}}</h3>
+  <h3>{{song.getMeta().artist}}</h3>
+  <h4>{{song.getMeta().cdtitle}}</h4>
+  <h4>{{song.getMeta().genre}}</h4>
 </div>
