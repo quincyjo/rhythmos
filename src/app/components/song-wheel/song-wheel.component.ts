@@ -9,7 +9,8 @@ import {SongProvider} from '../../services/index';
 @Component({
   selector: 'song-wheel',
   templateUrl: 'app/components/song-wheel/song-wheel.component.html',
-  styleUrls: ['app/components/song-wheel/song-wheel.component.css'],
+  styleUrls: ['app/components/song-wheel/song-wheel.component.css',
+              'css/loading.css'],
   providers: [SongProvider],
   directives: [ROUTER_DIRECTIVES, SongDetail],
   pipes: []
@@ -25,7 +26,6 @@ export class SongWheel {
 
   constructor(private _songProvider: SongProvider,
               private _router: Router) {
-                this.songs = [];
                 this.bgs = [];
                 this.audio = new Audio;
               }
@@ -86,7 +86,6 @@ export class SongWheel {
     }
     this.audio.src = music;
     this.audio.currentTime = start;
-    console.log(start, length);
     this.audio.removeEventListener('timeupdate', this._audioListener, false);
     this._audioListener = (event) => {
       if (this.audio.currentTime > start + length) {
@@ -94,12 +93,12 @@ export class SongWheel {
       }
     };
     this.audio.addEventListener('timeupdate', this._audioListener, false);
-    this.audio.play();
+    //this.audio.play();
   }
 
   public fetchBackground() {
     let bg: any;
-    if (this.songs[this.activeIndex]) {
+    if (this.songs && this.songs[this.activeIndex]) {
       let song = this.songs[this.activeIndex];
       if (song.getData().background === true) {
         this._songProvider.getBackground(song).then((background) => {

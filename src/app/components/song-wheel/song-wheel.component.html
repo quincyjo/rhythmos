@@ -1,5 +1,4 @@
-<div id="song-wheel"
->
+<div id="song-wheel">
   <div class="title">
     <h1>Select Music:</h1>
   </div>
@@ -16,8 +15,10 @@
       <song-detail [song]="getSelected()"></song-detail>
     </div>
     <div class="wheel">
+      <div class="loading"
+      *ngIf="!songs"></div>
       <ul class="songs">
-        <li class="song"
+        <li class="song" let li
           *ngFor="let song of songs; let i = index;"
           (mouseenter)="select(i)"
           (click)="play(song.id)"

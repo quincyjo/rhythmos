@@ -75,6 +75,7 @@
   background: rgba(50,50,50,0.75);
   margin-left: auto;
   box-shadow: -100px 0 100px -100px rgba(0,0,0,0.75);
+  position: relative;
 }
 
 .song-detail {
