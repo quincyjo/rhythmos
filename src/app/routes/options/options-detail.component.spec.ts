@@ -43,18 +43,4 @@ describe('OptionsDetailComponent', () => {
     tcb = _tcb;
   }));
 
-  it('should ...', done => {
-    return tcb
-    .overrideProviders(OptionsDetailComponent, [
-      provide(OptionsProvider, {useClass: MockOptionsProvider}),
-      provide(Router, {useClass: MockRouter})
-    ])
-    .createAsync(OptionsDetailComponent)
-    .then((fixture) => {
-      fixture.detectChanges();
-      done();
-    })
-    .catch(e => done());
-  });
-
 });

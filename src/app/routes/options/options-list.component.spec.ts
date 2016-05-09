@@ -28,7 +28,7 @@ class MockRouter {
   navigate() { }
 };
 
-describe('OptionsDetailComponent', () => {
+describe('OptionsListComponent', () => {
   let tcb;
 
   beforeEachProviders(() => [
@@ -42,19 +42,4 @@ describe('OptionsDetailComponent', () => {
   beforeEach(inject([TestComponentBuilder], (_tcb) => {
     tcb = _tcb;
   }));
-
-  it('should ...', done => {
-    return tcb
-    .overrideProviders(OptionsListComponent, [
-      provide(OptionsProvider, {useClass: MockOptionsProvider}),
-      provide(Router, {useClass: MockRouter})
-    ])
-    .createAsync(OptionsListComponent)
-    .then((fixture) => {
-      fixture.detectChanges();
-      done();
-    })
-    .catch(e => done());
-  });
-
 });
