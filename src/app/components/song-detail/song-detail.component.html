@@ -7,7 +7,7 @@
     </div>
     <div class="chart-container">
       <div class="chart-select {{chart.difficulty}}"
-        *ngFor="let chart of song.getCharts()">
+        *ngFor="let chart of song.getCharts() | sortCharts">
         <span class="difficulty">
           {{chart.difficulty}}
           {{chart.meter}}

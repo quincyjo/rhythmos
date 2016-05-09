@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {SongProvider} from '../../services/index';
 import {Song} from '../../shared/classes/index';
+import {SortChartsPipe} from '../../pipes/index';
 
 @Component({
   selector: 'song-detail',
@@ -8,7 +9,7 @@ import {Song} from '../../shared/classes/index';
   styleUrls: ['app/components/song-detail/song-detail.component.css'],
   providers: [],
   directives: [],
-  pipes: []
+  pipes: [SortChartsPipe]
 })
 
 export class SongDetail {
