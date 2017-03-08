@@ -1,0 +1,14 @@
+{{index}}
+<ul>
+  <li
+    class="menu-item"
+    [ngClass]="{
+      active: index === i
+    }"
+    (mouseenter)="select(i)"
+    *ngFor="let item of items; let i = index">
+    {{item.text}}
+  </li>
+</ul>
+<div (click)="next($event)">NEXT</div>
+<div (click)="prev($event)">PREV</div>

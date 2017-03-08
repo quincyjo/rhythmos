@@ -1,0 +1,16 @@
+@import "base";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding-top: $nav-bar-height;
+  padding-left: $side-bar-width-collapsed;
+}
+
+i.material-icons {
+  @include user-select(none);
+}

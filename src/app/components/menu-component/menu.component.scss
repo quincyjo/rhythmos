@@ -1,0 +1,9 @@
+ul {
+  list-style: none;
+
+  & li.menu-item {
+    &.active {
+      background: #000;
+    }
+  }
+}

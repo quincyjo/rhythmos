@@ -1,0 +1,46 @@
+@import "colors";
+
+// Font weights
+$light: 100;
+$regular: 400;
+$bold: 600;
+
+// Base Font
+$roboto-path: "../../shared/fonts/roboto/Roboto-Regular.ttf";
+$base-font-family: Roboto;
+$base-font-weight: $regular;
+$base-font-size: 14px;
+$base-line-height: 1.5;
+$base-font-color: $off-black;
+
+// Fixed Font
+$fixed-font-family: monospace;
+$fixed-font-size: 85%;
+$fixed-line-height: $base-line-height;
+
+// Headings
+$h1-fontsize: 4.2rem !default;
+$h2-fontsize: 3.56rem !default;
+$h3-fontsize: 2.92rem !default;
+$h4-fontsize: 2.28rem !default;
+$h5-fontsize: 1.64rem !default;
+$h6-fontsize: 1rem !default;
+$header-font-weight: $bold;
+
+// Style
+$section-shadow-outset: 0 0 5px rgba(0, 0, 0, 0.3);
+
+// Layout
+$content-width: 1200px;
+$content-padding-base: 8px;
+$nav-bar-height: 50px;
+$nav-item-max-width: 250px;
+$side-bar-width-expanded: 300px;
+$side-bar-width-collapsed: 50px;
+$icon-size: 50px;
+$icon-font-size: $icon-size * 0.5;
+
+// Transitions
+$side-bar-transition: 0.2s ease-out;
+
+@import "../modules/all";

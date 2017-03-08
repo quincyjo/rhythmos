@@ -1,0 +1,6 @@
+ul {
+  list-style: none; }
+  ul li.menu-item.active {
+    background: #000; }
+
+/*# sourceMappingURL=menu.component.css.map */
